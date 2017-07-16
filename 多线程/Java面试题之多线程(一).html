@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html class="theme theme-white">
+<head>
+<meta charset="utf-8">
+<title>Java面试题之多线程(一)</title>
+<link href="https://www.zybuluo.com/static/assets/template-theme-white.css" rel="stylesheet" media="screen">
+<style type="text/css">
+
+#wmd-preview h1  {
+    color: #0077bb; /* 将标题改为蓝色 */
+}</style>
+</head>
+<body class="theme theme-white">
+<div id="wmd-preview" class="wmd-preview wmd-preview-full-reader"><div class="md-section-divider"></div><div class="md-section-divider"></div><h1 data-anchor-id="4cns" id="java面试题之多线程一">Java面试题之多线程(一)</h1><p data-anchor-id="v56s"><code>Java面试题</code> <code>多线程</code></p><hr><div class="md-section-divider"></div><h3 data-anchor-id="30b0" id="什么是进程">什么是进程？</h3><p data-anchor-id="237u">是一个具有一定独立功能的程序在一个数据集上的一次动态执行的过程，是操作系统进行资源分配和调度的一个独立单位，是应用程序运行的载体。</p><div class="md-section-divider"></div><h3 data-anchor-id="3jy0" id="什么是线程">什么是线程？</h3><p data-anchor-id="n586">线程是操作系统能够进行运算调度的最小单位。</p><p data-anchor-id="raio">它被包含在进程之中，是进程中的实际运作单位。</p><p data-anchor-id="4s5f">一条线程指的是进程中一个单一顺序的控制流，一个进程中可以并发多个线程，每条线程并行执行不同的任务。</p><div class="md-section-divider"></div><h3 data-anchor-id="jtsi" id="进程和线程的区别">进程和线程的区别？</h3><p data-anchor-id="0xdw">进程和线程的主要差别在于它们是不同的操作系统资源管理方式。</p><p data-anchor-id="wtyx">进程有独立的地址空间，一个进程崩溃后，在保护模式下不会对其它进程产生影响。</p><p data-anchor-id="f9j3">线程只是一个进程中的不同执行路径。线程有自己的堆栈和局部变量，但线程之间没有单独的地址空间，一个线程死掉就等于整个进程死掉，所以多进程的程序要比多线程的程序健壮，但在进程切换时，耗费资源较大，效率要差一些。</p><p data-anchor-id="rvoh">但对于一些要求同时进行并且又要共享某些变量的并发操作，只能用线程，不能用进程。</p><div class="md-section-divider"></div><h3 data-anchor-id="btxr" id="多线程和单线程有什么区别">多线程和单线程有什么区别？</h3><p data-anchor-id="xk71">单线程程序：程序执行过程中只有一个有效操作的序列，不同操作之间都有明确的执行先后顺序，容易出现代码阻塞</p><p data-anchor-id="39n0">多线程程序：有多个线程，线程间独立运行，能有效地避免代码阻塞，并且提高程序的运行性能</p><div class="md-section-divider"></div><h3 data-anchor-id="qsa2" id="为什么要使用多线程">为什么要使用多线程？</h3><p data-anchor-id="shpp">（1）使用多线程可以减少程序的响应时间。 <br>
+在单线程的情况下，如果某个程序很耗时或者陷入长时间等待（如等待网络响应），此时程序将不会相应鼠标和键盘等操作，使用多线程后，可以把这个耗时的线程分配到一个单独的线程去执行，从而是程序具备了更好的交互性。 </p><p data-anchor-id="62n6">（2）与进程相比，线程的创建和切换开销更小。 <br>
+由于启动一个新的线程必须给这个线程分配独立的地址空间，建立许多数据结构来维护线程代码段、数据段等信息，而运行于同一个进程内的线程共享代码段、数据段，线程的启动或切换的开销就比进程要少很多。同时多线程在数据共享方面效率非常高。</p><p data-anchor-id="dgey">（3）多CPU或多核心计算机本身就具有执行多线程的能力。 <br>
+如果使用单个线程，将无法重复利用计算机资源，造成资源的巨大浪费。因此在多CPU计算机上使用多线程能提高CPU的利用率。 </p><p data-anchor-id="b1dv">（4）使用多线程能简化程序的结构，使用程序便于理解和维护。 <br>
+ 一个非常复杂的进程可以分成多个线程来执行。</p><div class="md-section-divider"></div><h3 data-anchor-id="gdm0" id="什么是线程安全">什么是线程安全？</h3><p data-anchor-id="1pt7">当多个线程访问同一个对象时，如果不用考虑这些线程在运行时环境下的调度和交替运行，也不需要进行额外的同步，或者在调用方进行任何其他的协调操作，调用这个对象的行为都可以获取正确的结果，那这个对象是线程安全的。 <br>
+——&lt;&lt;深入Java虚拟机&gt;&gt;</p><div class="md-section-divider"></div><h3 data-anchor-id="bus6" id="为何要使用线程同步">为何要使用线程同步？</h3><p data-anchor-id="l8v9">Java允许多线程并发控制，当多个线程同时操作一个可共享的资源变量时（如数据的增删改查），将会导致数据不准确，相互之间产生冲突。</p><p data-anchor-id="cg0g">因此加入同步锁以避免在该线程没有完成操作之前，被其他线程的调用，从而保证了该变量的唯一性和准确性。</p><div class="md-section-divider"></div><h3 data-anchor-id="fdpe" id="如何确保线程安全">如何确保线程安全？</h3><ul data-anchor-id="vmsl">
+<li>对非安全的代码进行加锁控制</li>
+<li>使用线程安全的类</li>
+<li>多线程并发情况下，线程共享的变量改为方法级的局部变量</li>
+</ul><div class="md-section-divider"></div><h3 data-anchor-id="m5me" id="什么是原子操作">什么是原子操作？</h3><p data-anchor-id="vnyy">检查数值、改变数值，以及可能发生的睡眠操作均作为单一的、不可分割的原子操作完成。</p><div class="md-section-divider"></div><h3 data-anchor-id="3v20" id="java内存模型是什么">Java内存模型是什么？</h3><ol data-anchor-id="a2z2">
+<li>Java中所有变量都储存在主存中，对于所有线程都是共享的（因为在同一进程中），每个线程都有自己的工作内存或本地内存(Working Memory)，工作内存中保存的是主存中某些变量的拷贝，线程对所有变量的操作都是在工作内存中进行，而线程之间无法相互直接访问，变量传递均需要通过主存完成，但是在程序内部可以互相调用(通过对象方法)，所有线程间的通信相对简单，速度也很快。 <br>
+<img src="http://static.zybuluo.com/homiss/pdhum1e0sytingqzuw8adnla/image_1bjs2pe46pu51j4n15er1h6g1o879.png" alt="http://www.jasongj.com/atom.xml" title=""></li>
+</ol><p data-anchor-id="1uru">2、进程间的内部数据和状态都是相互完全独立的，因此进程间通信大多数情况是必须通过网络实现。线程本身的数据，通常只有寄存器数据，以及一个程序执行时使用的堆栈，所以线程的切换比进程切换的负担要小。</p><p data-anchor-id="4vpt">3、CPU对于各个线程的调度是随机的（分时调度），在Java程序中，JVM负责线程的调度。 线程调度是指按照特定的机制为多个线程分配CPU的使用权，也就是实际执行的时候是线程，因此CPU调度的最小单位是线程，而资源分配的最小单位是进程。</p><div class="md-section-divider"></div><h3 data-anchor-id="yeql" id="java中堆和栈有什么不同">Java中堆和栈有什么不同？</h3><p data-anchor-id="j4ga">栈：在函数中定义的基本类型的变量和对象的引用变量都是在函数的栈内存中分配。</p><p data-anchor-id="w30t">堆：堆内存用于存放由new创建的对象和数组。</p><p data-anchor-id="j2qo">从通俗化的角度来说，堆是用来存放对象的，栈是用来存放执行程序的</p><div class="md-section-divider"></div><h3 data-anchor-id="5uek" id="jvm中哪个参数是用来控制线程的栈堆栈小的">JVM中哪个参数是用来控制线程的栈堆栈小的</h3><p data-anchor-id="mzng">-Xss参数用来控制线程的堆栈大小。</p><div class="md-section-divider"></div><h3 data-anchor-id="foc9" id="什么是竞态条件你怎样发现和解决竞争">什么是竞态条件？你怎样发现和解决竞争？</h3><p data-anchor-id="5je8">当两个线程竞争同一资源时，如果对资源的访问顺序敏感，就称存在竞态条件。</p><p data-anchor-id="bpdh">在临界区中使用适当的同步就可以避免竞态条件。</p><p data-anchor-id="dn4r">界区实现方法有两种，一种是用synchronized，一种是用Lock显式锁实现。</p><div class="md-section-divider"></div><h3 data-anchor-id="n1uq" id="线程安全的级别">线程安全的级别</h3><div class="md-section-divider"></div><h4 data-anchor-id="2yrv" id="不可变">不可变</h4><p data-anchor-id="w84j">不可变的对象一定是线程安全的，并且永远也不需要额外的同步。</p><blockquote data-anchor-id="emqy" class="white-blockquote">
+  <p>Java类库中大多数基本数值类如Integer、String和BigInteger都是不可变的。</p>
+</blockquote><div class="md-section-divider"></div><h4 data-anchor-id="7k89" id="无条件的线程安全">无条件的线程安全</h4><p data-anchor-id="azm1">由类的规格说明所规定的约束在对象被多个线程访问时仍然有效，不管运行时环境如何排列，线程都不需要任何额外的同步。</p><blockquote data-anchor-id="vvqe" class="white-blockquote">
+  <p>如 Random 、ConcurrentHashMap、Concurrent集合、atomic</p>
+</blockquote><div class="md-section-divider"></div><h4 data-anchor-id="rwuo" id="有条件的线程安全">有条件的线程安全</h4><p data-anchor-id="mqxx">有条件的线程安全类对于单独的操作可以是线程安全的，但是某些操作序列可能需要外部同步。</p><blockquote data-anchor-id="o4ux" class="white-blockquote">
+  <p>有条件线程安全的最常见的例子是遍历由 Hashtable 或者 Vector 或者返回的迭代器</p>
+</blockquote><div class="md-section-divider"></div><h4 data-anchor-id="pfe7" id="非线程安全线程兼容">非线程安全(线程兼容)</h4><p data-anchor-id="kt3c">线程兼容类不是线程安全的，但是可以通过正确使用同步而在并发环境中安全地使用。</p><blockquote data-anchor-id="wxcw" class="white-blockquote">
+  <p>如ArrayList HashMap</p>
+</blockquote><div class="md-section-divider"></div><h4 data-anchor-id="jn41" id="线程对立">线程对立</h4><p data-anchor-id="hw1q">线程对立是那些不管是否采用了同步措施，都不能在多线程环境中并发使用的代码。</p><blockquote data-anchor-id="j695" class="white-blockquote">
+  <p>如如System.setOut()、System.runFinalizersOnExit()</p>
+</blockquote><div class="md-section-divider"></div><h3 data-anchor-id="pw51" id="你对线程优先级的理解是什么">你对线程优先级的理解是什么？</h3><p data-anchor-id="t87e">每一个线程都是有优先级的，一般来说，高优先级的线程在运行时会具有优先权，但这依赖于线程调度的实现，这个实现是和操作系统相关的(OSdependent)。</p><p data-anchor-id="fg69">可以定义线程的优先级，但是这并不能保证高优先级的线程会在低优先级的线程前执行。线程优先级是一个int变量(从1-10)，1代表最低优先级，10代表最高优先级。</p><div class="md-section-divider"></div><h3 data-anchor-id="lxkk" id="什么是线程调度器thread-scheduler和时间分片time-slicing">什么是线程调度器(Thread Scheduler)和时间分片(Time Slicing)？</h3><p data-anchor-id="omjn">线程调度器是一个操作系统服务，它负责为Runnable状态的线程分配CPU时间。一旦创建一个线程并启动它，它的执行便依赖于线程调度器的实现。</p><p data-anchor-id="dt0s">时间分片是指将可用的CPU时间分配给可用的Runnable线程的过程。分配CPU时间可以基于线程优先级或者线程等待的时间。</p><p data-anchor-id="44an">线程调度并不受到Java虚拟机控制，所以由应用程序来控制它是更好的选择。</p><div class="md-section-divider"></div><h3 data-anchor-id="m2fz" id="在多线程中什么是上下文切换context-switching">在多线程中，什么是上下文切换(context-switching)？</h3><p data-anchor-id="ibh4">单核CPU也支持多线程执行代码，CPU通过给每个线程分配CPU时间片来实现这个机制。时间片是CPU分配给各个线程的时间，因为时间片非常短，所以CPU通过不停地切换线程执行，让我们感觉多个线程时同时执行的，时间片一般是几十毫秒（ms）。</p><p data-anchor-id="ibq5">操作系统中，CPU时间分片切换到另一个就绪的线程，则需要保存当前线程的运行的位置，同时需要加载需要恢复线程的环境信息。</p><div class="md-section-divider"></div><h3 data-anchor-id="cegh" id="用户线程和守护线程有什么区别">用户线程和守护线程有什么区别？</h3><p data-anchor-id="g62k">守护线程都是为JVM中所有非守护线程的运行提供便利服务： <br>
+只要当前JVM实例中尚存在任何一个非守护线程没有结束，守护线程就全部工作；只有当最后一个非守护线程结束时，守护线程随着JVM一同结束工作。</p><p data-anchor-id="y4w7">User和Daemon两者几乎没有区别，唯一的不同之处就在于虚拟机的离开：如果 User Thread已经全部退出运行了，只剩下Daemon Thread存在了，虚拟机也就退出了。</p><p data-anchor-id="hhyi">因为没有了被守护者，Daemon也就没有工作可做了，也就没有继续运行程序的必要了。</p><div class="md-section-divider"></div><h3 data-anchor-id="h705" id="如何创建守护线程以及在什么场合来使用它">如何创建守护线程？以及在什么场合来使用它？</h3><p data-anchor-id="ymaj">任何线程都可以设置为守护线程和用户线程，通过方法Thread.setDaemon(bool on)；true则把该线程设置为守护线程，反之则为用户线程。Thread.setDaemon()必须在Thread.start()之前调用，否则运行时会抛出异常。</p><p data-anchor-id="9jd9">守护线程相当于后台管理者 <br>
+比如 : 进行内存回收,垃圾清理等工作</p><div class="md-section-divider"></div><h3 data-anchor-id="ehu0" id="线程的状态转换">线程的状态转换？</h3><p data-anchor-id="r52r"><img src="http://static.zybuluo.com/homiss/w28vukxabw2kig93fb07552i/image_1bjs2qote9t8eq8cuo1bccbmom.png" alt="![Alt text](./1496240843849.png)" title=""> <br>
+1、新建状态（New）：新创建了一个线程对象。</p><p data-anchor-id="t6l9">2、就绪状态（Runnable）：线程对象创建后，其他线程调用了该对象的start()方法。该状态的线程位于可运行线程池中，变得可运行，等待获取CPU的使用权。</p><p data-anchor-id="mj42">3、运行状态（Running）：就绪状态的线程获取了CPU，执行程序代码。</p><p data-anchor-id="ttom">4、阻塞状态（Blocked）：阻塞状态是线程因为某种原因放弃CPU使用权，暂时停止运行。直到线程进入就绪状态，才有机会转到运行状态。阻塞的情况分三种： <br>
+（一）、等待阻塞：运行的线程执行wait()方法，JVM会把该线程放入等待池中。(wait会释放持有的锁) <br>
+（二）、同步阻塞：运行的线程在获取对象的同步锁时，若该同步锁被别的线程占用，则JVM会把该线程放入锁池中。 <br>
+（三）、其他阻塞：运行的线程执行sleep()或join()方法，或者发出了I/O请求时，JVM会把该线程置为阻塞状态。当sleep()状态超时、join()等待线程终止或者超时、或者I/O处理完毕时，线程重新转入就绪状态。（注意,sleep是不会释放持有的锁）</p><p data-anchor-id="wj0c">5、死亡状态（Dead）：线程执行完了或者因异常退出了run()方法，该线程结束生命周期。</p><div class="md-section-divider"></div><h3 data-anchor-id="5ebp" id="线程中断是否能直接调用stop为什么">线程中断是否能直接调用stop,为什么?</h3><p data-anchor-id="4iqc">Java提供的终止方法只有一个stop,但是不建议使用此方法,因为它有以下三个问题:</p><ol data-anchor-id="lbea">
+<li>stop方法是过时的 <br>
+从Java编码规则来说,已经过时的方式不建议采用.</li>
+<li>stop方法会导致代码逻辑不完整 <br>
+stop方法是一种"恶意"的中断,一旦执行stop方法,即终止当前正在运行的线程,不管线程逻辑是否完整,这是非常危险的.</li>
+</ol><div class="md-section-divider"></div><h3 data-anchor-id="0ebt" id="结束">结束</h3><p data-anchor-id="050j"><a href="https://segmentfault.com/a/1190000006671595" target="_blank">一道多线程面试题引起的自我救赎</a></p></div>
+</body>
+</html>
