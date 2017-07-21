@@ -7,8 +7,8 @@ github地址：https://github.com/Homiss/Java-interview-questions
 
 - [x] 面向对象
     - [面向对象面试题][1] 
-- [ ] UML介绍	
-- [ ] 设计模式
+- [x] UML介绍	
+- [x] 设计模式
 - [ ] Java8
 - [ ] 对象与垃圾回收
 - [x] 集合
@@ -24,7 +24,7 @@ github地址：https://github.com/Homiss/Java-interview-questions
 - [ ] I／O
 - [ ] Annotation
 - [ ] JDBC
-- [ ] 异常处理
+- [x] 异常处理
 - [x] JVM
     - [JVM面试题][7] 
 - [ ] 框架
