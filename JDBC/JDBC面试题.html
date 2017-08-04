@@ -12,7 +12,7 @@
 </head>
 <body class="theme theme-white">
 <div id="wmd-preview" class="wmd-preview wmd-preview-full-reader"><div class="md-section-divider"></div><div class="md-section-divider"></div><h1 data-anchor-id="2n40" id="jdbc面试题">JDBC面试题</h1><p data-anchor-id="97fq"><code>Java面试题</code> <code>JDBC</code></p><hr><div class="md-section-divider"></div><h3 data-anchor-id="sstc" id="什么是jdbc在什么时候会用到它">什么是JDBC，在什么时候会用到它？</h3><p data-anchor-id="ahl1">JDBC的全称是Java DataBase Connection，也就是Java数据库连接，我们可以用它来操作关系型数据库。JDBC接口及相关类在java.sql包和javax.sql包里。我们可以用它来连接数据库，执行SQL查询，存储过程，并处理返回的结果。</p><p data-anchor-id="y7rg">JDBC接口让Java程序和JDBC驱动实现了松耦合，使得切换不同的数据库变得更加简单。</p><div class="md-section-divider"></div><h3 data-anchor-id="gsfa" id="有哪些不同类型的jdbc驱动">有哪些不同类型的JDBC驱动？</h3><p data-anchor-id="1err">有四类JDBC驱动。和数据库进行交互的Java程序分成两个部分，一部分是JDBC的API，实际工作的驱动则是另一部分。 <br>
-<img src="http://static.zybuluo.com/homiss/muknb0372s500un09297nb08/image_1blq868ecc3bguks6o17ro1eo919.png" alt="image_1blq868ecc3bguks6o17ro1eo919.png-275.8kB" title=""></p><p data-anchor-id="q7s8">A JDBC-ODBC Bridge plus ODBC Driver（类型1）：它使用ODBC驱动连接数据库。需要安装ODBC以便连接数据库，正因为这样，这种方式现在已经基本淘汰了。</p><p data-anchor-id="k0yk">B Native API partly Java technology-enabled driver（类型2）：这种驱动把JDBC调用适配成数据库的本地接口的调用。</p><p data-anchor-id="dhol">C Pure Java Driver for Database Middleware（类型3）：这个驱动把JDBC调用转发给中间件服务器，由它去和不同的数据库进行连接。用这种类型的驱动需要部署中间件服务器。这种方式增加了额外的网络调用，导致性能变差，因此很少使用。</p><p data-anchor-id="6nhm">D Direct-to-Database Pure Java Driver（类型4）：这个驱动把JDBC转化成数据库使用的网络协议。这种方案最简单，也适合通过网络连接数据库。不过使用这种方式的话，需要根据不同数据库选用特定的驱动程序，比如OJDBC是Oracle开发的Oracle数据库的驱动，而MySQL Connector/J是MySQL数据库的驱动。</p><div class="md-section-divider"></div><h3 data-anchor-id="sxgv" id="jdbc是如何实现java程序和jdbc驱动的松耦合的">JDBC是如何实现Java程序和JDBC驱动的松耦合的？</h3><p data-anchor-id="pjhp">JDBC API使用Java的反射机制来实现Java程序和JDBC驱动的松耦合。随便看一个简单的JDBC示例，你会发现所有操作都是通过JDBC接口完成的，而驱动只有在通过Class.forName反射机制来加载的时候才会出现。</p><p data-anchor-id="mopk">我觉得这是Java核心库里反射机制的最佳实践之一，它使得应用程序和驱动程序之间进行了隔离，让迁移数据库的工作变得更简单。在这里可以看到更多JDBC的使用示例。</p><div class="md-section-divider"></div><h3 data-anchor-id="9kxs" id="什么是jdbc连接在java中如何创建一个jdbc连接">什么是JDBC连接，在Java中如何创建一个JDBC连接？</h3><p data-anchor-id="dhui">JDBC连接是和数据库服务器建立的一个会话。你可以想像成是一个和数据库的Socket连接。</p><p data-anchor-id="itbz">创建JDBC连接很简单，只需要两步：</p><p data-anchor-id="kjb8">A. 注册并加载驱动：使用Class.forName()，驱动类就会注册到DriverManager里面并加载到内存里。 B. 用DriverManager获取连接对象：调用DriverManager.getConnnection()方法并传入数据库连接的URL，用户名及密码，就能获取到连接对象。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="vjbd"><ol class="linenums"><li class="L0"><code class="language-java"><span class="typ">Connection</span><span class="pln"> con </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">null</span><span class="pun">;</span></code></li><li class="L1"><code class="language-java"><span class="kwd">try</span><span class="pun">{</span></code></li><li class="L2"><code class="language-java"><span class="pln">    </span><span class="com">// load the Driver Class</span></code></li><li class="L3"><code class="language-java"><span class="pln">    </span><span class="typ">Class</span><span class="pun">.</span><span class="pln">forName</span><span class="pun">(</span><span class="str">"com.mysql.jdbc.Driver"</span><span class="pun">);</span></code></li><li class="L4"><code class="language-java"><span class="pln">    </span><span class="com">// create the connection now</span></code></li><li class="L5"><code class="language-java"><span class="pln">    con </span><span class="pun">=</span><span class="pln"> </span><span class="typ">DriverManager</span><span class="pun">.</span><span class="pln">getConnection</span><span class="pun">(</span><span class="str">"jdbc:mysql://localhost:3306/UserDB"</span><span class="pun">,</span></code></li><li class="L6"><code class="language-java"><span class="pln">                    </span><span class="str">"pankaj"</span><span class="pun">,</span></code></li><li class="L7"><code class="language-java"><span class="pln">                    </span><span class="str">"pankaj123"</span><span class="pun">);</span></code></li><li class="L8"><code class="language-java"><span class="pln">    </span><span class="pun">}</span><span class="kwd">catch</span><span class="pln"> </span><span class="pun">(</span><span class="typ">SQLException</span><span class="pln"> e</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L9"><code class="language-java"><span class="pln">            </span><span class="typ">System</span><span class="pun">.</span><span class="pln">out</span><span class="pun">.</span><span class="pln">println</span><span class="pun">(</span><span class="str">"Check database is UP and configs are correct"</span><span class="pun">);</span></code></li><li class="L0"><code class="language-java"><span class="pln">            e</span><span class="pun">.</span><span class="pln">printStackTrace</span><span class="pun">();</span></code></li><li class="L1"><code class="language-java"><span class="pln">    </span><span class="pun">}</span><span class="kwd">catch</span><span class="pln"> </span><span class="pun">(</span><span class="typ">ClassNotFoundException</span><span class="pln"> e</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L2"><code class="language-java"><span class="pln">            </span><span class="typ">System</span><span class="pun">.</span><span class="pln">out</span><span class="pun">.</span><span class="pln">println</span><span class="pun">(</span><span class="str">"Please include JDBC MySQL jar in classpath"</span><span class="pun">);</span></code></li><li class="L3"><code class="language-java"><span class="pln">            e</span><span class="pun">.</span><span class="pln">printStackTrace</span><span class="pun">();</span></code></li><li class="L4"><code class="language-java"><span class="pun">}</span></code></li></ol></pre><div class="md-section-divider"></div><h3 data-anchor-id="a9lm" id="jdbc的drivermanager是用来做什么的">JDBC的DriverManager是用来做什么的？</h3><p data-anchor-id="qbh5">JDBC的DriverManager是一个工厂类，我们通过它来创建数据库连接。当JDBC的Driver类被加载进来时，它会自己注册到DriverManager类里面，你可以看下JDBC Driver类的源码来了解一下。</p><p data-anchor-id="63pa">然后我们会把数据库配置信息传成DriverManager.getConnection()方法，DriverManager会使用注册到它里面的驱动来获取数据库连接，并返回给调用的程序。</p><div class="md-section-divider"></div><h3 data-anchor-id="flu5" id="在java程序中如何获取数据库服务器的相关信息">在Java程序中，如何获取数据库服务器的相关信息？</h3><p data-anchor-id="w39n">使用DatabaseMetaData可以获取到服务器的信息。当和数据库的连接成功建立了之后，可以通过调用getMetaData()方法来获取数据库的元信息。DatabaseMetaData里面有很多方法，通过它们可以获取到数据库的产品名称，版本号，配置信息等。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="u7hn"><ol class="linenums"><li class="L0"><code class="language-java"><span class="typ">DatabaseMetaData</span><span class="pln"> metaData </span><span class="pun">=</span><span class="pln"> con</span><span class="pun">.</span><span class="pln">getMetaData</span><span class="pun">();</span></code></li><li class="L1"><code class="language-java"><span class="typ">String</span><span class="pln"> dbProduct </span><span class="pun">=</span><span class="pln"> metaData</span><span class="pun">.</span><span class="pln">getDatabaseProductName</span><span class="pun">();</span></code></li></ol></pre><div class="md-section-divider"></div><h3 data-anchor-id="jgwu" id="jdbc的statement是什么">JDBC的Statement是什么？</h3><p data-anchor-id="nzz5">Statement是JDBC中用来执行数据库SQL查询语句的接口。通过调用连接对象的getStatement()方法我们可以生成一个Statement对象。我们可以通过调用它的execute()，executeQuery()，executeUpdate()方法来执行静态SQL查询。</p><p data-anchor-id="uwaw">由于SQL语句是程序中传入的，如果没有对用户输入进行校验的话可能会引起SQL注入的问题，如果想了解更多关于SQL注入的，可以看下这里。</p><p data-anchor-id="0r0b">默认情况下，一个Statement同时只能打开一个ResultSet。如果想操作多个ResultSet对象的话，需要创建多个Statement。Statement接口的所有execute方法开始执行时都默认会关闭当前打开的ResultSet。</p><div class="md-section-divider"></div><h3 data-anchor-id="6jkw" id="executeexecutequeryexecuteupdate的区别是什么">execute，executeQuery，executeUpdate的区别是什么？</h3><p data-anchor-id="oz0u">Statement的execute(String query)方法用来执行任意的SQL查询，如果查询的结果是一个ResultSet，这个方法就返回true。如果结果不是ResultSet，比如insert或者update查询，它就会返回false。我们可以通过它的getResultSet方法来获取ResultSet，或者通过getUpdateCount()方法来获取更新的记录条数。</p><p data-anchor-id="krh1">Statement的executeQuery(String query)接口用来执行select查询，并且返回ResultSet。即使查询不到记录返回的ResultSet也不会为null。我们通常使用executeQuery来执行查询语句，这样的话如果传进来的是insert或者update语句的话，它会抛出错误信息为 “executeQuery method can not be used for update”的java.util.SQLException。</p><p data-anchor-id="zon1">Statement的executeUpdate(String query)方法用来执行insert或者update/delete（DML）语句，或者 什么也不返回DDL语句。返回值是int类型，如果是DML语句的话，它就是更新的条数，如果是DDL的话，就返回0。</p><p data-anchor-id="dmp8">只有当你不确定是什么语句的时候才应该使用execute()方法，否则应该使用executeQuery或者executeUpdate方法。</p><div class="md-section-divider"></div><h3 data-anchor-id="hagb" id="jdbc的preparedstatement是什么">JDBC的PreparedStatement是什么？</h3><p data-anchor-id="u8u3">PreparedStatement对象代表的是一个预编译的SQL语句。用它提供的setter方法可以传入查询的变量。</p><p data-anchor-id="x13t">由于PreparedStatement是预编译的，通过它可以将对应的SQL语句高效的执行多次。由于PreparedStatement自动对特殊字符转义，避免了SQL注入攻击，因此应当尽量的使用它。</p><div class="md-section-divider"></div><h3 data-anchor-id="gtbb" id="preparedstatement中如何注入null值">PreparedStatement中如何注入NULL值？</h3><p data-anchor-id="akm2">可以使用它的setNull方法来把null值绑定到指定的变量上。setNull方法需要传入参数的索引以及SQL字段的类型，像这样：</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="xz3s"><ol class="linenums"><li class="L0"><code class="language-java"><span class="pln">ps</span><span class="pun">.</span><span class="pln">setNull</span><span class="pun">(</span><span class="lit">10</span><span class="pun">,</span><span class="pln"> java</span><span class="pun">.</span><span class="pln">sql</span><span class="pun">.</span><span class="typ">Types</span><span class="pun">.</span><span class="pln">INTEGER</span><span class="pun">);</span></code></li></ol></pre><div class="md-section-divider"></div><h3 data-anchor-id="g8cg" id="statement中的getgeneratedkeys方法有什么用">Statement中的getGeneratedKeys方法有什么用？</h3><p data-anchor-id="oxbr">有的时候表会生成主键，这时候就可以用Statement的getGeneratedKeys()方法来获取这个自动生成的主键的值了。</p><div class="md-section-divider"></div><h3 data-anchor-id="jvv9" id="相对于statementpreparedstatement的优点是什么">相对于Statement，PreparedStatement的优点是什么？</h3><p data-anchor-id="04og">它和Statement相比优点在于：</p><p data-anchor-id="e6md">PreparedStatement有助于防止SQL注入，因为它会自动对特殊字符转义。 <br>
+<img src="http://static.zybuluo.com/homiss/muknb0372s500un09297nb08/image_1blq868ecc3bguks6o17ro1eo919.png" alt="image_1blq868ecc3bguks6o17ro1eo919.png-275.8kB" title=""></p><p data-anchor-id="q7s8">A JDBC-ODBC Bridge plus ODBC Driver（类型1）：它使用ODBC驱动连接数据库。需要安装ODBC以便连接数据库，正因为这样，这种方式现在已经基本淘汰了。</p><p data-anchor-id="k0yk">B Native API partly Java technology-enabled driver（类型2）：这种驱动把JDBC调用适配成数据库的本地接口的调用。</p><p data-anchor-id="dhol">C Pure Java Driver for Database Middleware（类型3）：这个驱动把JDBC调用转发给中间件服务器，由它去和不同的数据库进行连接。用这种类型的驱动需要部署中间件服务器。这种方式增加了额外的网络调用，导致性能变差，因此很少使用。</p><p data-anchor-id="6nhm">D Direct-to-Database Pure Java Driver（类型4）：这个驱动把JDBC转化成数据库使用的网络协议。这种方案最简单，也适合通过网络连接数据库。不过使用这种方式的话，需要根据不同数据库选用特定的驱动程序，比如OJDBC是Oracle开发的Oracle数据库的驱动，而MySQL Connector/J是MySQL数据库的驱动。</p><div class="md-section-divider"></div><h3 data-anchor-id="sxgv" id="jdbc是如何实现java程序和jdbc驱动的松耦合的">JDBC是如何实现Java程序和JDBC驱动的松耦合的？</h3><p data-anchor-id="pjhp">JDBC API使用Java的反射机制来实现Java程序和JDBC驱动的松耦合。随便看一个简单的JDBC示例，你会发现所有操作都是通过JDBC接口完成的，而驱动只有在通过Class.forName反射机制来加载的时候才会出现。</p><p data-anchor-id="mopk">我觉得这是Java核心库里反射机制的最佳实践之一，它使得应用程序和驱动程序之间进行了隔离，让迁移数据库的工作变得更简单。在这里可以看到更多JDBC的使用示例。</p><div class="md-section-divider"></div><h3 data-anchor-id="9kxs" id="什么是jdbc连接在java中如何创建一个jdbc连接">什么是JDBC连接，在Java中如何创建一个JDBC连接？</h3><p data-anchor-id="dhui">JDBC连接是和数据库服务器建立的一个会话。你可以想像成是一个和数据库的Socket连接。</p><p data-anchor-id="itbz">创建JDBC连接很简单，只需要两步：</p><p data-anchor-id="kjb8">A. 注册并加载驱动：使用Class.forName()，驱动类就会注册到DriverManager里面并加载到内存里。 B. 用DriverManager获取连接对象：调用DriverManager.getConnnection()方法并传入数据库连接的URL，用户名及密码，就能获取到连接对象。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="vjbd"><ol class="linenums"><li class="L0"><code class="language-java"><span class="typ">Connection</span><span class="pln"> con </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">null</span><span class="pun">;</span></code></li><li class="L1"><code class="language-java"><span class="kwd">try</span><span class="pun">{</span></code></li><li class="L2"><code class="language-java"><span class="pln">    </span><span class="com">// load the Driver Class</span></code></li><li class="L3"><code class="language-java"><span class="pln">    </span><span class="typ">Class</span><span class="pun">.</span><span class="pln">forName</span><span class="pun">(</span><span class="str">"com.mysql.jdbc.Driver"</span><span class="pun">);</span></code></li><li class="L4"><code class="language-java"><span class="pln">    </span><span class="com">// create the connection now</span></code></li><li class="L5"><code class="language-java"><span class="pln">    con </span><span class="pun">=</span><span class="pln"> </span><span class="typ">DriverManager</span><span class="pun">.</span><span class="pln">getConnection</span><span class="pun">(</span><span class="str">"jdbc:mysql://localhost:3306/UserDB"</span><span class="pun">,</span></code></li><li class="L6"><code class="language-java"><span class="pln">                    </span><span class="str">"pankaj"</span><span class="pun">,</span></code></li><li class="L7"><code class="language-java"><span class="pln">                    </span><span class="str">"pankaj123"</span><span class="pun">);</span></code></li><li class="L8"><code class="language-java"><span class="pln">    </span><span class="pun">}</span><span class="kwd">catch</span><span class="pln"> </span><span class="pun">(</span><span class="typ">SQLException</span><span class="pln"> e</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L9"><code class="language-java"><span class="pln">            </span><span class="typ">System</span><span class="pun">.</span><span class="pln">out</span><span class="pun">.</span><span class="pln">println</span><span class="pun">(</span><span class="str">"Check database is UP and configs are correct"</span><span class="pun">);</span></code></li><li class="L0"><code class="language-java"><span class="pln">            e</span><span class="pun">.</span><span class="pln">printStackTrace</span><span class="pun">();</span></code></li><li class="L1"><code class="language-java"><span class="pln">    </span><span class="pun">}</span><span class="kwd">catch</span><span class="pln"> </span><span class="pun">(</span><span class="typ">ClassNotFoundException</span><span class="pln"> e</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L2"><code class="language-java"><span class="pln">            </span><span class="typ">System</span><span class="pun">.</span><span class="pln">out</span><span class="pun">.</span><span class="pln">println</span><span class="pun">(</span><span class="str">"Please include JDBC MySQL jar in classpath"</span><span class="pun">);</span></code></li><li class="L3"><code class="language-java"><span class="pln">            e</span><span class="pun">.</span><span class="pln">printStackTrace</span><span class="pun">();</span></code></li><li class="L4"><code class="language-java"><span class="pun">}</span></code></li></ol></pre><div class="md-section-divider"></div><h3 data-anchor-id="qdp9" id="阐述jdbc操作数据库的步骤">阐述JDBC操作数据库的步骤?</h3><p data-anchor-id="380p">加载驱动。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="t5yu"><ol class="linenums"><li class="L0"><code><span class="typ">Class</span><span class="pun">.</span><span class="pln">forName</span><span class="pun">(</span><span class="str">"oracle.jdbc.driver.OracleDriver"</span><span class="pun">);</span></code></li></ol></pre><p data-anchor-id="dxd9">创建连接。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="rw8a"><ol class="linenums"><li class="L0"><code><span class="typ">Connection</span><span class="pln"> con </span><span class="pun">=</span><span class="pln"> </span><span class="typ">DriverManager</span><span class="pun">.</span><span class="pln">getConnection</span><span class="pun">(</span><span class="str">"jdbc:oracle:thin:@localhost:1521:orcl"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"scott"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"tiger"</span><span class="pun">);</span></code></li></ol></pre><p data-anchor-id="ghd4">创建语句。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="bjyu"><ol class="linenums"><li class="L0"><code><span class="typ">PreparedStatement</span><span class="pln"> ps </span><span class="pun">=</span><span class="pln"> con</span><span class="pun">.</span><span class="pln">prepareStatement</span><span class="pun">(</span><span class="str">"select * from emp where sal between ? and ?"</span><span class="pun">);</span></code></li><li class="L1"><code><span class="pln">    ps</span><span class="pun">.</span><span class="pln">setInt</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1000</span><span class="pun">);</span></code></li><li class="L2"><code><span class="pln">    ps</span><span class="pun">.</span><span class="pln">setInt</span><span class="pun">(</span><span class="lit">2</span><span class="pun">,</span><span class="pln"> </span><span class="lit">3000</span><span class="pun">);</span></code></li></ol></pre><p data-anchor-id="oyfg">执行语句。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="0dxs"><ol class="linenums"><li class="L0"><code><span class="typ">ResultSet</span><span class="pln"> rs </span><span class="pun">=</span><span class="pln"> ps</span><span class="pun">.</span><span class="pln">executeQuery</span><span class="pun">();</span></code></li></ol></pre><p data-anchor-id="xyl4">处理结果。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="q2u0"><ol class="linenums"><li class="L0"><code><span class="kwd">while</span><span class="pun">(</span><span class="pln">rs</span><span class="pun">.</span><span class="kwd">next</span><span class="pun">())</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L1"><code><span class="pln">        </span><span class="typ">System</span><span class="pun">.</span><span class="kwd">out</span><span class="pun">.</span><span class="pln">println</span><span class="pun">(</span><span class="pln">rs</span><span class="pun">.</span><span class="pln">getInt</span><span class="pun">(</span><span class="str">"empno"</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="str">" - "</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> rs</span><span class="pun">.</span><span class="pln">getString</span><span class="pun">(</span><span class="str">"ename"</span><span class="pun">));</span></code></li><li class="L2"><code><span class="pun">}</span></code></li></ol></pre><p data-anchor-id="o9bk">关闭资源。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="qq22"><ol class="linenums"><li class="L0"><code><span class="kwd">finally</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L1"><code><span class="pln">    </span><span class="kwd">if</span><span class="pun">(</span><span class="pln">con </span><span class="pun">!=</span><span class="pln"> </span><span class="kwd">null</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L2"><code><span class="pln">        </span><span class="kwd">try</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L3"><code><span class="pln">            con</span><span class="pun">.</span><span class="pln">close</span><span class="pun">();</span></code></li><li class="L4"><code><span class="pln">        </span><span class="pun">}</span><span class="pln"> </span><span class="kwd">catch</span><span class="pln"> </span><span class="pun">(</span><span class="typ">SQLException</span><span class="pln"> e</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span></code></li><li class="L5"><code><span class="pln">            e</span><span class="pun">.</span><span class="pln">printStackTrace</span><span class="pun">();</span></code></li><li class="L6"><code><span class="pln">        </span><span class="pun">}</span></code></li><li class="L7"><code><span class="pln">    </span><span class="pun">}</span></code></li><li class="L8"><code><span class="pun">}</span></code></li></ol></pre><div class="md-section-divider"></div><h3 data-anchor-id="wp0t" id="使用jdbc操作数据库时如何提升读取数据的性能如何提升更新数据的性能">使用JDBC操作数据库时，如何提升读取数据的性能？如何提升更新数据的性能？</h3><p data-anchor-id="fsb7">答：要提升读取数据的性能，可以指定通过结果集（ResultSet）对象的setFetchSize()方法指定每次抓取的记录数（典型的空间换时间策略）；要提升更新数据的性能可以使用PreparedStatement语句构建批处理，将若干SQL语句置于一个批处理中执行。</p><div class="md-section-divider"></div><h3 data-anchor-id="n0da" id="jdbc的drivermanager是用来做什么的">JDBC的DriverManager是用来做什么的？</h3><p data-anchor-id="k9c4">JDBC的DriverManager是一个工厂类，我们通过它来创建数据库连接。当JDBC的Driver类被加载进来时，它会自己注册到DriverManager类里面，你可以看下JDBC Driver类的源码来了解一下。</p><p data-anchor-id="9j9m">然后我们会把数据库配置信息传成DriverManager.getConnection()方法，DriverManager会使用注册到它里面的驱动来获取数据库连接，并返回给调用的程序。</p><div class="md-section-divider"></div><h3 data-anchor-id="wf6y" id="在进行数据库编程时连接池有什么作用">在进行数据库编程时，连接池有什么作用？</h3><p data-anchor-id="2l3n">答：由于创建连接和释放连接都有很大的开销（尤其是数据库服务器不在本地时，每次建立连接都需要进行TCP的三次握手，释放连接需要进行TCP四次握手，造成的开销是不可忽视的），为了提升系统访问数据库的性能，可以事先创建若干连接置于连接池中，需要时直接从连接池获取，使用结束时归还连接池而不必关闭连接，从而避免频繁创建和释放连接所造成的开销，这是典型的用空间换取时间的策略（浪费了空间存储连接，但节省了创建和释放连接的时间）。池化技术在Java开发中是很常见的，在使用线程时创建线程池的道理与此相同。基于Java的开源数据库连接池主要有：C3P0、Proxool、DBCP、BoneCP、Druid等。</p><div class="md-section-divider"></div><h3 data-anchor-id="0brw" id="什么是dao模式">什么是DAO模式？</h3><p data-anchor-id="fn6v">答：DAO（Data Access Object）顾名思义是一个为数据库或其他持久化机制提供了抽象接口的对象，在不暴露底层持久化方案实现细节的前提下提供了各种数据访问操作。在实际的开发中，应该将所有对数据源的访问操作进行抽象化后封装在一个公共API中。用程序设计语言来说，就是建立一个接口，接口中定义了此应用程序中将会用到的所有事务方法。在这个应用程序中，当需要和数据源进行交互的时候则使用这个接口，并且编写一个单独的类来实现这个接口，在逻辑上该类对应一个特定的数据存储。DAO模式实际上包含了两个模式，一是Data Accessor（数据访问器），二是Data Object（数据对象），前者要解决如何访问数据的问题，而后者要解决的是如何用对象封装数据。</p><div class="md-section-divider"></div><h3 data-anchor-id="i0ty" id="在java程序中如何获取数据库服务器的相关信息">在Java程序中，如何获取数据库服务器的相关信息？</h3><p data-anchor-id="3tvk">使用DatabaseMetaData可以获取到服务器的信息。当和数据库的连接成功建立了之后，可以通过调用getMetaData()方法来获取数据库的元信息。DatabaseMetaData里面有很多方法，通过它们可以获取到数据库的产品名称，版本号，配置信息等。</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="5qnh"><ol class="linenums"><li class="L0"><code class="language-java"><span class="typ">DatabaseMetaData</span><span class="pln"> metaData </span><span class="pun">=</span><span class="pln"> con</span><span class="pun">.</span><span class="pln">getMetaData</span><span class="pun">();</span></code></li><li class="L1"><code class="language-java"><span class="typ">String</span><span class="pln"> dbProduct </span><span class="pun">=</span><span class="pln"> metaData</span><span class="pun">.</span><span class="pln">getDatabaseProductName</span><span class="pun">();</span></code></li></ol></pre><div class="md-section-divider"></div><h3 data-anchor-id="jgwu" id="jdbc的statement是什么">JDBC的Statement是什么？</h3><p data-anchor-id="nzz5">Statement是JDBC中用来执行数据库SQL查询语句的接口。通过调用连接对象的getStatement()方法我们可以生成一个Statement对象。我们可以通过调用它的execute()，executeQuery()，executeUpdate()方法来执行静态SQL查询。</p><p data-anchor-id="uwaw">由于SQL语句是程序中传入的，如果没有对用户输入进行校验的话可能会引起SQL注入的问题，如果想了解更多关于SQL注入的，可以看下这里。</p><p data-anchor-id="0r0b">默认情况下，一个Statement同时只能打开一个ResultSet。如果想操作多个ResultSet对象的话，需要创建多个Statement。Statement接口的所有execute方法开始执行时都默认会关闭当前打开的ResultSet。</p><div class="md-section-divider"></div><h3 data-anchor-id="6jkw" id="executeexecutequeryexecuteupdate的区别是什么">execute，executeQuery，executeUpdate的区别是什么？</h3><p data-anchor-id="oz0u">Statement的execute(String query)方法用来执行任意的SQL查询，如果查询的结果是一个ResultSet，这个方法就返回true。如果结果不是ResultSet，比如insert或者update查询，它就会返回false。我们可以通过它的getResultSet方法来获取ResultSet，或者通过getUpdateCount()方法来获取更新的记录条数。</p><p data-anchor-id="krh1">Statement的executeQuery(String query)接口用来执行select查询，并且返回ResultSet。即使查询不到记录返回的ResultSet也不会为null。我们通常使用executeQuery来执行查询语句，这样的话如果传进来的是insert或者update语句的话，它会抛出错误信息为 “executeQuery method can not be used for update”的java.util.SQLException。</p><p data-anchor-id="zon1">Statement的executeUpdate(String query)方法用来执行insert或者update/delete（DML）语句，或者 什么也不返回DDL语句。返回值是int类型，如果是DML语句的话，它就是更新的条数，如果是DDL的话，就返回0。</p><p data-anchor-id="dmp8">只有当你不确定是什么语句的时候才应该使用execute()方法，否则应该使用executeQuery或者executeUpdate方法。</p><div class="md-section-divider"></div><h3 data-anchor-id="hagb" id="jdbc的preparedstatement是什么">JDBC的PreparedStatement是什么？</h3><p data-anchor-id="u8u3">PreparedStatement对象代表的是一个预编译的SQL语句。用它提供的setter方法可以传入查询的变量。</p><p data-anchor-id="x13t">由于PreparedStatement是预编译的，通过它可以将对应的SQL语句高效的执行多次。由于PreparedStatement自动对特殊字符转义，避免了SQL注入攻击，因此应当尽量的使用它。</p><div class="md-section-divider"></div><h3 data-anchor-id="gtbb" id="preparedstatement中如何注入null值">PreparedStatement中如何注入NULL值？</h3><p data-anchor-id="akm2">可以使用它的setNull方法来把null值绑定到指定的变量上。setNull方法需要传入参数的索引以及SQL字段的类型，像这样：</p><div class="md-section-divider"></div><pre class="prettyprint linenums prettyprinted" data-anchor-id="xz3s"><ol class="linenums"><li class="L0"><code class="language-java"><span class="pln">ps</span><span class="pun">.</span><span class="pln">setNull</span><span class="pun">(</span><span class="lit">10</span><span class="pun">,</span><span class="pln"> java</span><span class="pun">.</span><span class="pln">sql</span><span class="pun">.</span><span class="typ">Types</span><span class="pun">.</span><span class="pln">INTEGER</span><span class="pun">);</span></code></li></ol></pre><div class="md-section-divider"></div><h3 data-anchor-id="g8cg" id="statement中的getgeneratedkeys方法有什么用">Statement中的getGeneratedKeys方法有什么用？</h3><p data-anchor-id="oxbr">有的时候表会生成主键，这时候就可以用Statement的getGeneratedKeys()方法来获取这个自动生成的主键的值了。</p><div class="md-section-divider"></div><h3 data-anchor-id="jvv9" id="相对于statementpreparedstatement的优点是什么">相对于Statement，PreparedStatement的优点是什么？</h3><p data-anchor-id="04og">它和Statement相比优点在于：</p><p data-anchor-id="e6md">PreparedStatement有助于防止SQL注入，因为它会自动对特殊字符转义。 <br>
 PreparedStatement可以用来进行动态查询。 <br>
 PreparedStatement执行更快。尤其当你重用它或者使用它的拼量查询接口执行多条语句时。 <br>
 使用PreparedStatement的setter方法更容易写出面向对象的代码，而Statement的话，我们得拼接字符串来生成查询语句。如果参数太多了，字符串拼接看起来会非常丑陋并且容易出错。</p><div class="md-section-divider"></div><h3 data-anchor-id="1cc3" id="preparedstatement的缺点是什么怎么解决这个问题">PreparedStatement的缺点是什么，怎么解决这个问题？</h3><p data-anchor-id="0fe6">PreparedStatement的一个缺点是，我们不能直接用它来执行in条件语句；需要执行IN条件语句的话，下面有一些解决方案：</p><ul data-anchor-id="cm8x">
@@ -102,7 +102,291 @@ RowSet分为两大类：</li>
 <li>数据库隔离级别越高性能越差，确保你的数据库连接设置的隔离级别是最优的。</li>
 <li>如果在WEB程序中创建数据库连接，最好通过JNDI使用JDBC的数据源，这样可以对连接进行重用。</li>
 <li>如果你需要长时间对ResultSet进行操作的话，尽量使用离线的RowSet。</li>
-</ul><div class="md-section-divider"></div><h3 data-anchor-id="9tz7" id="结束">结束</h3><p data-anchor-id="z8t3">参考： <br>
+</ul><div class="md-section-divider"></div><h3 data-anchor-id="aqdm" id="事务的acid是指什么">事务的ACID是指什么？</h3><p data-anchor-id="p8qq">答：  <br>
+- 原子性(Atomic)：事务中各项操作，要么全做要么全不做，任何一项操作的失败都会导致整个事务的失败；  <br>
+- 一致性(Consistent)：事务结束后系统状态是一致的；  <br>
+- 隔离性(Isolated)：并发执行的事务彼此无法看到对方的中间状态；  <br>
+- 持久性(Durable)：事务完成后所做的改动都会被持久化，即使发生灾难性的失败。通过日志和同步备份可以在故障发生后重建数据。</p><p data-anchor-id="66g3">脏读（Dirty Read）：A事务读取B事务尚未提交的数据并在此基础上操作，而B事务执行回滚，那么A读取到的数据就是脏数据。</p><table data-anchor-id="mkiw" class="table table-striped-white table-bordered">
+<thead>
+<tr>
+ <th>时间</th>
+ <th>转账事务A</th>
+ <th>取款事务B</th>
+</tr>
+</thead>
+<tbody><tr>
+ <td>T1</td>
+ <td></td>
+ <td>开始事务</td>
+</tr>
+<tr>
+ <td>T2</td>
+ <td>开始事务</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T3</td>
+ <td></td>
+ <td>查询账户余额为1000元</td>
+</tr>
+<tr>
+ <td>T4</td>
+ <td></td>
+ <td>取出500元余额修改为500元</td>
+</tr>
+<tr>
+ <td>T5</td>
+ <td>查询账户余额为500元（脏读）</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T6</td>
+ <td></td>
+ <td>撤销事务余额恢复为1000元</td>
+</tr>
+<tr>
+ <td>T7</td>
+ <td>汇入100元把余额修改为600元</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T8</td>
+ <td>提交事务</td>
+ <td></td>
+</tr>
+</tbody></table><p data-anchor-id="f68f">不可重复读（Unrepeatable Read）：事务A重新读取前面读取过的数据，发现该数据已经被另一个已提交的事务B修改过了。</p><table data-anchor-id="6duu" class="table table-striped-white table-bordered">
+<thead>
+<tr>
+ <th>时间</th>
+ <th>转账事务A</th>
+ <th>取款事务B</th>
+</tr>
+</thead>
+<tbody><tr>
+ <td>T1</td>
+ <td></td>
+ <td>开始事务</td>
+</tr>
+<tr>
+ <td>T2</td>
+ <td>开始事务</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T3</td>
+ <td></td>
+ <td>查询账户余额为1000元</td>
+</tr>
+<tr>
+ <td>T4</td>
+ <td>查询账户余额为1000元</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T5</td>
+ <td></td>
+ <td>取出100元修改余额为900元</td>
+</tr>
+<tr>
+ <td>T6</td>
+ <td></td>
+ <td>提交事务</td>
+</tr>
+<tr>
+ <td>T7</td>
+ <td>查询账户余额为900元（不可重复读）</td>
+ <td></td>
+</tr>
+</tbody></table><p data-anchor-id="3klz">幻读（Phantom Read）：事务A重新执行一个查询，返回一系列符合查询条件的行，发现其中插入了被事务B提交的行。</p><table data-anchor-id="7i2w" class="table table-striped-white table-bordered">
+<thead>
+<tr>
+ <th>时间</th>
+ <th>统计金额事务A</th>
+ <th>转账事务B</th>
+</tr>
+</thead>
+<tbody><tr>
+ <td>T1</td>
+ <td></td>
+ <td>开始事务</td>
+</tr>
+<tr>
+ <td>T2</td>
+ <td>开始事务</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T3</td>
+ <td>统计总存款为10000元</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T4</td>
+ <td></td>
+ <td>新增一个存款账户存入100元</td>
+</tr>
+<tr>
+ <td>T5</td>
+ <td></td>
+ <td>提交事务</td>
+</tr>
+<tr>
+ <td>T6</td>
+ <td>再次统计总存款为10100元（幻读）</td>
+ <td></td>
+</tr>
+</tbody></table><p data-anchor-id="ej6m">第1类丢失更新：事务A撤销时，把已经提交的事务B的更新数据覆盖了。</p><table data-anchor-id="843a" class="table table-striped-white table-bordered">
+<thead>
+<tr>
+ <th>时间</th>
+ <th>取款事务A</th>
+ <th>转账事务B</th>
+</tr>
+</thead>
+<tbody><tr>
+ <td>T1</td>
+ <td>开始事务</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T2</td>
+ <td></td>
+ <td>开始事务</td>
+</tr>
+<tr>
+ <td>T3</td>
+ <td>查询账户余额为1000元</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T4</td>
+ <td></td>
+ <td>查询账户余额为1000元</td>
+</tr>
+<tr>
+ <td>T5</td>
+ <td></td>
+ <td>汇入100元修改余额为1100元</td>
+</tr>
+<tr>
+ <td>T6</td>
+ <td></td>
+ <td>提交事务</td>
+</tr>
+<tr>
+ <td>T7</td>
+ <td>取出100元将余额修改为900元</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T8</td>
+ <td>撤销事务</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T9</td>
+ <td>余额恢复为1000元（丢失更新）</td>
+ <td></td>
+</tr>
+</tbody></table><p data-anchor-id="6e06">第2类丢失更新：事务A覆盖事务B已经提交的数据，造成事务B所做的操作丢失。</p><table data-anchor-id="8p5z" class="table table-striped-white table-bordered">
+<thead>
+<tr>
+ <th>时间</th>
+ <th>转账事务A</th>
+ <th>取款事务B</th>
+</tr>
+</thead>
+<tbody><tr>
+ <td>T1</td>
+ <td></td>
+ <td></td>
+</tr>
+<tr>
+ <td>T2</td>
+ <td>开始事务</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T3</td>
+ <td></td>
+ <td>查询账户余额为1000元</td>
+</tr>
+<tr>
+ <td>T4</td>
+ <td>查询账户余额为1000元</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T5</td>
+ <td></td>
+ <td>取出100元将余额修改为900元</td>
+</tr>
+<tr>
+ <td>T6</td>
+ <td></td>
+ <td>提交事务</td>
+</tr>
+<tr>
+ <td>T7</td>
+ <td>汇入100元将余额修改为1100元</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T8</td>
+ <td>提交事务</td>
+ <td></td>
+</tr>
+<tr>
+ <td>T9</td>
+ <td>查询账户余额为1100元（丢失更新）</td>
+ <td></td>
+</tr>
+</tbody></table><p data-anchor-id="pe10">数据并发访问所产生的问题，在有些场景下可能是允许的，但是有些场景下可能就是致命的，数据库通常会通过锁机制来解决数据并发访问问题，按锁定对象不同可以分为表级锁和行级锁；按并发事务锁定关系可以分为共享锁和独占锁，具体的内容大家可以自行查阅资料进行了解。  <br>
+直接使用锁是非常麻烦的，为此数据库为用户提供了自动锁机制，只要用户指定会话的事务隔离级别，数据库就会通过分析SQL语句然后为事务访问的资源加上合适的锁，此外，数据库还会维护这些锁通过各种手段提高系统的性能，这些对用户来说都是透明的（就是说你不用理解，事实上我确实也不知道）。ANSI/ISO SQL 92标准定义了4个等级的事务隔离级别，如下表所示：</p><table data-anchor-id="p2xo" class="table table-striped-white table-bordered">
+<thead>
+<tr>
+ <th>隔离级别</th>
+ <th>脏读</th>
+ <th>不可重复读</th>
+ <th>幻读</th>
+ <th>第一类丢失更新</th>
+ <th>第二类丢失更新</th>
+</tr>
+</thead>
+<tbody><tr>
+ <td>READ UNCOMMITED</td>
+ <td>允许</td>
+ <td>允许</td>
+ <td>允许</td>
+ <td>不允许</td>
+ <td>允许</td>
+</tr>
+<tr>
+ <td>READ COMMITTED</td>
+ <td>不允许</td>
+ <td>允许</td>
+ <td>允许</td>
+ <td>不允许</td>
+ <td>允许</td>
+</tr>
+<tr>
+ <td>REPEATABLE READ</td>
+ <td>不允许</td>
+ <td>不允许</td>
+ <td>允许</td>
+ <td>不允许</td>
+ <td>不允许</td>
+</tr>
+<tr>
+ <td>SERIALIZABLE</td>
+ <td>不允许</td>
+ <td>不允许</td>
+ <td>不允许</td>
+ <td>不允许</td>
+ <td>不允许</td>
+</tr>
+</tbody></table><p data-anchor-id="xcei">需要说明的是，事务隔离级别和数据访问的并发性是对立的，事务隔离级别越高并发性就越差。所以要根据具体的应用来确定合适的事务隔离级别，这个地方没有万能的原则。</p><div class="md-section-divider"></div><h3 data-anchor-id="r1a5" id="jdbc中如何进行事务处理">JDBC中如何进行事务处理？</h3><p data-anchor-id="rrr1">答：Connection提供了事务处理的方法，通过调用setAutoCommit(false)可以设置手动提交事务；当事务完成后用commit()显式提交事务；如果在事务处理过程中发生异常则通过rollback()进行事务回滚。除此之外，从JDBC 3.0中还引入了Savepoint（保存点）的概念，允许通过代码设置保存点并让事务回滚到指定的保存点。  <br>
+<img src="http://static.zybuluo.com/homiss/t7cotcyknxrfr0b8yatszdc5/image_1bmf383no15vdk7e10gd941bkl9.png" alt="image_1bmf383no15vdk7e10gd941bkl9.png-4.3kB" title=""></p><div class="md-section-divider"></div><h3 data-anchor-id="9tz7" id="结束">结束</h3><p data-anchor-id="z8t3">参考： <br>
 <a href="http://it.deepinmind.com/jdbc/2014/03/18/JDBC-common-question-1.html" target="_blank">JDBC常见面试题集锦(一)</a> <br>
 <a href="http://it.deepinmind.com/jdbc/2014/03/19/JDBC-common-questions-for-interview.html" target="_blank">JDBC常见面试题集锦(二)</a></p></div>
 </body>
