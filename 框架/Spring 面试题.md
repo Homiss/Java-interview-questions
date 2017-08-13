@@ -3,17 +3,15 @@
 标签（空格分隔）： Java面试题 Spring
 
 ---
-### 什么是spring?
-
-Spring 是个java企业级应用的开源开发框架。Spring主要用来开发Java应用，但是有些扩展是针对构建J2EE平台的web应用。Spring 框架目标是简化Java企业级应用开发，并通过POJO为基础的编程模型促进良好的编程习惯。
 
 ### 选择使用Spring框架的原因?
-- 非侵入式：支持基于POJO的编程模式，不强制性的要求实现Spring框架中的接口或继承Spring框架中的类。 
-- IoC容器：IoC容器帮助应用程序管理对象以及对象之间的依赖关系，对象之间的依赖关系如果发生了改变只需要修改配置文件而不是修改代码，因为代码的修改可能意味着项目的重新构建和完整的回归测试。有了IoC容器，程序员再也不需要自己编写工厂、单例，这一点特别符合Spring的精神"不要重复的发明轮子"。 
-- AOP（面向切面编程）：将所有的横切关注功能封装到切面（aspect）中，通过配置的方式将横切关注功能动态添加到目标代码上，进一步实现了业务逻辑和系统服务之间的分离。另一方面，有了AOP程序员可以省去很多自己写代理类的工作。 
-- MVC：Spring的MVC框架是非常优秀的，从各个方面都可以甩Struts 2几条街，为Web表示层提供了更好的解决方案。 
-- 事务管理：Spring以宽广的胸怀接纳多种持久层技术，并且为其提供了声明式的事务管理，在不需要任何一行代码的情况下就能够完成事务管理。 
-- 其他：选择Spring框架的原因还远不止于此，Spring为Java企业级开发提供了一站式选择，你可以在需要的时候使用它的部分和全部，更重要的是，你甚至可以在感觉不到Spring存在的情况下，在你的项目中使用Spring提供的各种优秀的功能。
+使用Spring：
+第一是使用它的IOC功能，在解耦上达到了配置级别。
+第二是使用它对数据库访问事务相关的封装。
+第三就是各种其他组件与Spring的融合，在Spring中更加方便快捷的继承其他一些组件。
+
+### Spring 是如何管理事务的？
+spring的事务声明有两种方式，编程式和声明式。spring主要是通过“声明式事务”的方式对事务进行管理，即在配置文件中进行声明，通过AOP将事务切面切入程序，最大的好处是大大减少了代码量。
 
 ### Spring IoC容器配置Bean的方式？ 
 答： 
@@ -21,16 +19,38 @@ Spring 是个java企业级应用的开源开发框架。Spring主要用来开发
 - 基于注解进行配置。 
 - 基于Java程序进行配置（Spring 3+）
 
+### Bean 是如何被管理的？
+在Spring框架中，一旦把一个bean纳入到Spring IoC容器之中，这个bean的生命周期就会交由容器进行管理，一般担当管理者角色的是BeanFactory或ApplicationContext。认识一下Bean的生命周期活动，对更好的利用它有很大的帮助。
+
+概括来说主要有四个阶段：实例化，初始化，使用，销毁。
+
 ### 阐述Spring框架中Bean的生命周期？ 
-答： 
-① Spring IoC容器找到关于Bean的定义并实例化该Bean。 
-② Spring IoC容器对Bean进行依赖注入。 
-③ 如果Bean实现了BeanNameAware接口，则将该Bean的id传给setBeanName方法。 
-④ 如果Bean实现了BeanFactoryAware接口，则将BeanFactory对象传给setBeanFactory方法。 
-⑤ 如果Bean实现了BeanPostProcessor接口，则调用其postProcessBeforeInitialization方法。 
-⑥ 如果Bean实现了InitializingBean接口，则调用其afterPropertySet方法。 
-⑦ 如果有和Bean关联的BeanPostProcessors对象，则这些对象的postProcessAfterInitialization方法被调用。 
-⑧ 当销毁Bean实例时，如果Bean实现了DisposableBean接口，则调用其destroy方法。
+![image_1bn52fcs3vuo1vsv1efaqqcn1sm.png-69.2kB][1]
+ApplicationContext容器中，Bean的生命周期流程如上图所示，流程大致如下：
+
+1.首先容器启动后，会对scope为singleton且非懒加载的bean进行实例化，
+
+2.按照Bean定义信息配置信息，注入所有的属性，
+
+3.如果Bean实现了BeanNameAware接口，会回调该接口的setBeanName()方法，传入该Bean的id，此时该Bean就获得了自己在配置文件中的id，
+
+4.如果Bean实现了BeanFactoryAware接口,会回调该接口的setBeanFactory()方法，传入该Bean的BeanFactory，这样该Bean就获得了自己所在的BeanFactory，
+
+5.如果Bean实现了ApplicationContextAware接口,会回调该接口的setApplicationContext()方法，传入该Bean的ApplicationContext，这样该Bean就获得了自己所在的ApplicationContext，
+
+6.如果有Bean实现了BeanPostProcessor接口，则会回调该接口的postProcessBeforeInitialzation()方法，
+
+7.如果Bean实现了InitializingBean接口，则会回调该接口的afterPropertiesSet()方法，
+
+8.如果Bean配置了init-method方法，则会执行init-method配置的方法，
+
+9.如果有Bean实现了BeanPostProcessor接口，则会回调该接口的postProcessAfterInitialization()方法，
+
+10.经过流程9之后，就可以正式使用该Bean了,对于scope为singleton的Bean,Spring的ioc容器中会缓存一份该bean的实例，而对于scope为prototype的Bean,每次被调用都会new一个新的对象，期生命周期就交给调用方管理了，不再是Spring容器进行管理了
+
+11.容器关闭后，如果Bean实现了DisposableBean接口，则会回调该接口的destroy()方法，
+
+12.如果Bean配置了destroy-method方法，则会执行destroy-method配置的方法，至此，整个Bean的生命周期结束
 
 ### 依赖注入时如何注入集合属性？ 
 答：可以在定义Bean属性时，通过
@@ -43,21 +63,61 @@ Spring 是个java企业级应用的开源开发框架。Spring主要用来开发
 答： 
 - 如果使用了构造器注入或者setter注入，那么将覆盖自动装配的依赖关系。 
 - 基本数据类型的值、字符串字面量、类字面量无法使用自动装配来注入。 
-- 优先考虑使用显式的装配来进行更精确的依赖注入而不是使用自动装配。
+- 优先考虑使用显式的装配来进行更精确的依赖注入而不是使用自动装配。  
+
+### Resource 是如何被查找、加载的？
+Resource 接口是 Spring 资源访问策略的抽象，它本身并不提供任何资源访问实现，具体的资源访问由该接口的实现类完成——每个实现类代表一种资源访问策略。
+Spring 为 Resource 接口提供了如下实现类：
+
+- UrlResource：访问网络资源的实现类。
+- ClassPathResource：访问类加载路径里资源的实现类。
+- FileSystemResource：访问文件系统里资源的实现类。
+- ServletContextResource：访问相对于 ServletContext 路径里的资源的实现类：
+- InputStreamResource：访问输入流资源的实现类。
+- ByteArrayResource：访问字节数组资源的实现类。
+这些 Resource 实现类，针对不同的的底层资源，提供了相应的资源访问逻辑，并提供便捷的包装，以利于客户端程序的资源访问。
+
+
+### 有哪些常用的 Context？
+最常被使用的 ApplicationContext 接口实现：
+
+- FileSystemXmlApplicationContext：该容器从 XML 文件中加载已被定义的 bean。在这里，你需要提供给构造器 XML 文件的完整路径
+
+- ClassPathXmlApplicationContext：该容器从 XML 文件中加载已被定义的 bean。在这里，你不需要提供 XML 文件的完整路径，只需正确配置 CLASSPATH 环境变量即可，因为，容器会从 CLASSPATH 中搜索 bean 配置文件。
+
+- WebXmlApplicationContext：该容器会在一个 web 应用程序的范围内加载在 XML 文件中已被定义的 bean。
+
 
 ### Spring中Bean的作用域有哪些？ 
-答：在Spring的早期版本中，仅有两个作用域：singleton和prototype，前者表示Bean以单例的方式存在；后者表示每次从容器中调用Bean时，都会返回一个新的实例，prototype通常翻译为原型。
-
-> 补充：设计模式中的创建型模式中也有一个原型模式，原型模式也是一个常用的模式，例如做一个室内设计软件，所有的素材都在工具箱中，而每次从工具箱中取出的都是素材对象的一个原型，可以通过对象克隆来实现原型模式。
-
-Spring 2.x中针对WebApplicationContext新增了3个作用域，分别是：request（每次HTTP请求都会创建一个新的Bean）、session（同一个HttpSession共享同一个Bean，不同的HttpSession使用不同的Bean）和globalSession（同一个全局Session共享一个Bean）。
+#### singleton作用域
+在默认情况下,spring的ApplicationContext容器在启动时,自动实例化所有singleton的Bean并缓存于容器中.虽然启动时会花费一些时间,但带来两个好处:首先对Bean提前的实例化操作会及早发现一些潜在的配置问题.其次Bean以缓存的方式保存,当运行时使用到该Bean时就无须再实例化了,加快了运行效率.如果用户不希望在容器启动时提前实例化singleton的Bean,可以通过lazy-init属性进行控制.
+#### prototype
+在默认情况下,spring容器在启动时不实例化prototype的Bean.此外,spring容器将prototype的Bean交给调用者后,就不再管理它的生命周期.
+#### request作用域
+每次HTTP请求都会创建一个新的Bean,HTTP请求处理完毕后,销毁这个Bean.该作用域仅适用于webApplicationContext环境.
+#### session作用域
+同一个HTTP session共享一个Bean,不同HTTP session使用不同的Bean,当HTTP Session结束后,实例才被销毁.该作用域仅适用于webApplicationContext环境
+#### globalSession作用域
+同一个全局session共享一个Bean,一般用于portlet应用环境,该作用域仅适用于webApplicationContext环境.
 
 ### 什么是IoC和DI？DI是如何实现的？ 
-答：IoC叫控制反转，是Inversion of Control的缩写，DI（Dependency Injection）叫依赖注入，是对IoC更简单的诠释。控制反转是把传统上由程序代码直接操控的对象的调用权交给容器，通过容器来实现对象组件的装配和管理。所谓的"控制反转"就是对组件对象控制权的转移，从程序代码本身转移到了外部容器，由容器来创建对象并管理对象之间的依赖关系。IoC体现了好莱坞原则 - "Don’t call me, we will call you"。依赖注入的基本原则是应用组件不应该负责查找资源或者其他依赖的协作对象。配置对象的工作应该由容器负责，查找资源的逻辑应该从应用组件的代码中抽取出来，交给容器来完成。DI是对IoC更准确的描述，即组件之间的依赖关系由容器在运行期决定，形象的来说，即由容器动态的将某种依赖关系注入到组件之中。
-
-举个例子：一个类A需要用到接口B中的方法，那么就需要为类A和接口B建立关联或依赖关系，最原始的方法是在类A中创建一个接口B的实现类C的实例，但这种方法需要开发人员自行维护二者的依赖关系，也就是说当依赖关系发生变动的时候需要修改代码并重新构建整个系统。如果通过一个容器来管理这些对象以及对象的依赖关系，则只需要在类A中定义好用于关联接口B的方法（构造器或setter方法），将类A和接口B的实现类C放入容器中，通过对容器的配置来实现二者的关联。
-
-依赖注入可以通过setter方法注入（设值注入）、构造器注入和接口注入三种方式来实现，Spring支持setter注入和构造器注入，通常使用构造器注入来注入必须的依赖关系，对于可选的依赖关系，则setter注入是更好的选择，setter注入需要类提供无参构造器或者无参的静态工厂方法来创建对象。
+#### IOC
+IOC是Inversion of Control的缩写，“控制反转”之意。
+软件系统在没有引入IOC容器之前，对象A依赖于对象B，那么对象A在初始化或者运行到某一点的时候，自己必须主动去创建对象B或者使用已经创建的对象B。无论是创建还是使用对象B，控制权都在自己手上。
+软件系统在引入IOC容器之后，这种情形就完全改变了，由于IOC容器的加入，对象A与对象B之间失去了直接联系，所以，当对象A运行到需要对象B的时候，IOC容器会主动创建一个对象B注入到对象A需要的地方。
+通过前后的对比，我们不难看出来：对象A获得依赖对象B的过程,由主动行为变为了被动行为，控制权颠倒过来了，这就是“控制反转”这个名称的由来。
+#### DI
+2004年，Martin Fowler探讨了同一个问题，既然IOC是控制反转，那么到底是“哪些方面的控制被反转了呢？”，经过详细地分析和论证后，他得出了答案：“获得依赖对象的过程被反转了”。控制被反转之后，获得依赖对象的过程由自身管理变为了由IOC容器主动注入。
+依赖注入(DI)和控制反转(IOC)是从不同的角度的描述的同一件事情，就是指通过引入IOC容器，利用依赖关系注入的方式，实现对象之间的解耦。
+#### 优点
+降低类之间耦合，可维护性比较好，非常便于进行单元测试，便于调试程序和诊断故障。
+模块之间通过接口交流，互不干扰，便于团队开发。
+可复用性好
+模块具有热插拔特性，可直接修改配置文件。
+#### 缺点
+引入了第三方IOC容器，生成对象的步骤变得有些复杂
+IOC容器生成对象是通过反射方式，在运行效率上有一定的损耗。
+额外的配置工作。
 
 ### 解释一下什么叫AOP（面向切面编程）？ 
 答：AOP（Aspect-Oriented Programming）指一种程序设计范型，该范型以一种称为切面（aspect）的语言构造为基础，切面是一种新的模块化机制，用来描述分散在对象、类或方法中的横切关注点（crosscutting concern）。
@@ -72,7 +132,7 @@ b. 切点（Pointcut）：如果连接点相当于数据中的记录，那么切
 c. 增强（Advice）：增强是织入到目标类连接点上的一段程序代码。Spring提供的增强接口都是带方位名的，如：BeforeAdvice、AfterReturningAdvice、ThrowsAdvice等。很多资料上将增强译为“通知”，这明显是个词不达意的翻译，让很多程序员困惑了许久。
 
 说明： Advice在国内的很多书面资料中都被翻译成"通知"，但是很显然这个翻译无法表达其本质，有少量的读物上将这个词翻译为"增强"，这个翻译是对Advice较为准确的诠释，我们通过AOP将横切关注功能加到原有的业务逻辑上，这就是对原有业务逻辑的一种增强，这种增强可以是前置增强、后置增强、返回后增强、抛异常时增强和包围型增强。
-d. 引介（Introduction）：引介是一种特殊的增强，它为类添加一些属性和方法。这样，即使一个业务类原本没有实现某个接口，通过引介功能，可以动态的未该业务类添加接口的实现逻辑，让业务类成为这个接口的实现类。 
+d. 引介（Introduction）：引介是一种特殊的增强，它为类添加一些属性和方法。这样，即使一个业务类原本没有实现某个接口，通过引介功能，可以动态的为该业务类添加接口的实现逻辑，让业务类成为这个接口的实现类。 
 e. 织入（Weaving）：织入是将增强添加到目标类具体连接点上的过程，AOP有三种织入方式：①编译期织入：需要特殊的Java编译期（例如AspectJ的ajc）；②装载期织入：要求使用特殊的类加载器，在装载类的时候对类进行增强；③运行时织入：在运行时为目标类生成代理实现增强。Spring采用了动态代理的方式实现了运行时织入，而AspectJ采用了编译期织入和装载期织入的方式。 
 f. 切面（Aspect）：切面是由切点和增强（引介）组成的，它包括了对横切关注功能的定义，也包括了对连接点的定义。
 
@@ -93,7 +153,7 @@ f. 切面（Aspect）：切面是由切点和增强（引介）组成的，它�
 
 ### Spring MVC的工作原理是怎样的？ 
 Spring MVC的工作原理如下图所示： 
-![image_1bn4to93b12l712ue1kom92o1pv29.png-131.9kB][1]
+![image_1bn4to93b12l712ue1kom92o1pv29.png-131.9kB][2]
 ① 客户端的所有请求都交给前端控制器DispatcherServlet来处理，它会负责调用系统的其他模块来真正处理用户的请求。 
 ② DispatcherServlet收到请求后，将根据请求的信息（包括URL、HTTP协议方法、请求头、请求参数、Cookie等）以及HandlerMapping的配置找到处理该请求的Handler（任何一个对象都可以作为请求的Handler）。 
 ③在这个地方Spring会通过HandlerAdapter对该处理器进行封装。 
@@ -159,23 +219,6 @@ Spring框架支持以下五种bean的作用域：
 
 不，Spring框架中的单例bean不是线程安全的。
 
-### 解释Spring框架中bean的生命周期。
-
-Spring容器 从XML 文件中读取bean的定义，并实例化bean。
-Spring根据bean的定义填充所有的属性。
-如果bean实现了BeanNameAware 接口，Spring 传递bean 的ID 到 setBeanName方法。
-如果Bean 实现了 BeanFactoryAware 接口， Spring传递beanfactory 给setBeanFactory 方法。
-如果有任何与bean相关联的BeanPostProcessors，Spring会在postProcesserBeforeInitialization()方法内调用它们。
-如果bean实现IntializingBean了，调用它的afterPropertySet方法，如果bean声明了初始化方法，调用此初始化方法。
-如果有BeanPostProcessors 和bean 关联，这些bean的postProcessAfterInitialization() 方法将被调用。
-如果bean实现了 DisposableBean，它将调用destroy()方法。
-
-### 哪些是重要的bean生命周期方法？ 你能重载它们吗？
-
-有两个重要的bean 生命周期方法，第一个是setup ， 它是在容器加载bean的时候被调用。第二个方法是 teardown 它是在容器卸载类的时候被调用。
-
-The bean 标签有两个重要的属性（init-method和destroy-method）。用它们你可以自己定制初始化和注销方法。它们也有相应的注解（@PostConstruct和@PreDestroy）。
-
 ### 什么是Spring的内部bean？
 
 当一个bean仅被用作另一个bean的属性时，它能被声明为一个内部bean，为了定义inner bean，在Spring 的 基于XML的 配置元数据中，可以在<property/>或<constructor-arg/>元素内使用 元素，内部bean通常是匿名的，它们的Scope一般是prototype。
@@ -188,15 +231,6 @@ The bean 标签有两个重要的属性（init-method和destroy-method）。用�
 
 Spring 容器能够自动装配相互合作的bean，这意味着容器不需要和配置，能通过Bean工厂自动处理bean之间的协作。
 
-### 解释不同方式的自动装配 。
-
-有五种自动装配的方式，可以用来指导Spring容器用自动装配方式来进行依赖注入。
-
-no：默认的方式是不进行自动装配，通过显式设置ref 属性来进行装配。
-byName：通过参数名 自动装配，Spring容器在配置文件中发现bean的autowire属性被设置成byname，之后容器试图匹配、装配和该bean的属性具有相同名字的bean。
-byType:：通过参数类型自动装配，Spring容器在配置文件中发现bean的autowire属性被设置成byType，之后容器试图匹配、装配和该bean的属性具有相同类型的bean。如果有多个bean符合条件，则抛出错误。
-constructor：这个方式类似于 byType， 但是要提供给构造器参数，如果没有确定的带参数的构造器参数类型，将会抛出异常。
-autodetect：首先尝试使用constructor来自动装配，如果无法工作，则使用byType方式。
 
 ###自动装配有哪些局限性 ?
 
@@ -205,6 +239,7 @@ autodetect：首先尝试使用constructor来自动装配，如果无法工作�
 重写： 你仍需用 和 配置来定义依赖，意味着总要重写自动装配。
 基本数据类型：你不能自动装配简单的属性，如基本数据类型，String字符串，和类。
 模糊特性：自动装配不如显式装配精确，如果有可能，建议使用显式装配。
+
 ### 你可以在Spring中注入一个null 和一个空字符串吗？
 
 可以。
@@ -255,16 +290,6 @@ Spring对数据访问对象（DAO）的支持旨在简化它和数据访问技�
 
 控制反转 Hibernate Template和 Callback。
 继承 HibernateDAOSupport提供一个AOP 拦截器。
-### Spring支持的ORM
-
-Spring支持以下ORM：
-
-Hibernate
-iBatis
-JPA (Java Persistence API)
-TopLink
-JDO (Java Data Objects)
-OJB
 
 ### 如何通过HibernateDaoSupport将Spring和Hibernate结合起来？
 
@@ -287,13 +312,9 @@ Spring支持两种类型的事务管理：
 它为编程式事务管理提供了一套简单的API而不是一些复杂的事务API如
 它支持声明式事务管理。
 它和Spring各种数据访问抽象层很好得集成。
+
 ### 你更倾向用那种事务管理类型？
-
 大多数Spring框架的用户选择声明式事务管理，因为它对应用代码的影响最小，因此更符合一个无侵入的轻量级容器的思想。声明式事务管理要优于编程式事务管理，虽然比编程式事务管理（这种方式允许你通过代码控制事务）少了一点灵活性。
-
-### 解释AOP
-
-面向切面的编程，或AOP， 是一种编程技术，允许程序模块化横向切割关注点，或横切典型的责任划分，如日志和事务管理。
 
 ### Aspect 切面
 
@@ -377,4 +398,5 @@ WebApplicationContext 继承了ApplicationContext 并增加了一些WEB应用必
 ### 结束
 
 
-  [1]: http://static.zybuluo.com/homiss/5or6tre94bzlj7o8luscf1av/image_1bn4to93b12l712ue1kom92o1pv29.png
+  [1]: http://static.zybuluo.com/homiss/urnuhc7ebq5j481ekaxuxpge/image_1bn52fcs3vuo1vsv1efaqqcn1sm.png
+  [2]: http://static.zybuluo.com/homiss/5or6tre94bzlj7o8luscf1av/image_1bn4to93b12l712ue1kom92o1pv29.png
