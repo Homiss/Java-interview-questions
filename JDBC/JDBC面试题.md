@@ -24,14 +24,13 @@ D Direct-to-Database Pure Java Driver（类型4）：这个驱动把JDBC转化�
 ### JDBC是如何实现Java程序和JDBC驱动的松耦合的？
 JDBC API使用Java的反射机制来实现Java程序和JDBC驱动的松耦合。随便看一个简单的JDBC示例，你会发现所有操作都是通过JDBC接口完成的，而驱动只有在通过Class.forName反射机制来加载的时候才会出现。
 
-我觉得这是Java核心库里反射机制的最佳实践之一，它使得应用程序和驱动程序之间进行了隔离，让迁移数据库的工作变得更简单。在这里可以看到更多JDBC的使用示例。
-
 ### 什么是JDBC连接，在Java中如何创建一个JDBC连接？
 JDBC连接是和数据库服务器建立的一个会话。你可以想像成是一个和数据库的Socket连接。
 
 创建JDBC连接很简单，只需要两步：
 
-A. 注册并加载驱动：使用Class.forName()，驱动类就会注册到DriverManager里面并加载到内存里。 B. 用DriverManager获取连接对象：调用DriverManager.getConnnection()方法并传入数据库连接的URL，用户名及密码，就能获取到连接对象。
+A. 注册并加载驱动：使用Class.forName()，驱动类就会注册到DriverManager里面并加载到内存里。 
+B. 用DriverManager获取连接对象：调用DriverManager.getConnnection()方法并传入数据库连接的URL，用户名及密码，就能获取到连接对象。
 
 ```java
 Connection con = null;
@@ -91,39 +90,37 @@ finally {
 ```
 
 ### 使用JDBC操作数据库时，如何提升读取数据的性能？如何提升更新数据的性能？ 
-答：要提升读取数据的性能，可以指定通过结果集（ResultSet）对象的setFetchSize()方法指定每次抓取的记录数（典型的空间换时间策略）；要提升更新数据的性能可以使用PreparedStatement语句构建批处理，将若干SQL语句置于一个批处理中执行。
+要提升读取数据的性能，可以指定通过结果集（ResultSet）对象的setFetchSize()方法指定每次抓取的记录数（典型的空间换时间策略）；
+要提升更新数据的性能可以使用PreparedStatement语句构建批处理，将若干SQL语句置于一个批处理中执行。
 
 ### JDBC的DriverManager是用来做什么的？
-JDBC的DriverManager是一个工厂类，我们通过它来创建数据库连接。当JDBC的Driver类被加载进来时，它会自己注册到DriverManager类里面，你可以看下JDBC Driver类的源码来了解一下。
+JDBC的DriverManager是一个工厂类，我们通过它来创建数据库连接。当JDBC的Driver类被加载进来时，它会自己注册到DriverManager类里面。
 
 然后我们会把数据库配置信息传成DriverManager.getConnection()方法，DriverManager会使用注册到它里面的驱动来获取数据库连接，并返回给调用的程序。
 
 ### 在进行数据库编程时，连接池有什么作用？ 
-答：由于创建连接和释放连接都有很大的开销（尤其是数据库服务器不在本地时，每次建立连接都需要进行TCP的三次握手，释放连接需要进行TCP四次握手，造成的开销是不可忽视的），为了提升系统访问数据库的性能，可以事先创建若干连接置于连接池中，需要时直接从连接池获取，使用结束时归还连接池而不必关闭连接，从而避免频繁创建和释放连接所造成的开销，这是典型的用空间换取时间的策略（浪费了空间存储连接，但节省了创建和释放连接的时间）。池化技术在Java开发中是很常见的，在使用线程时创建线程池的道理与此相同。基于Java的开源数据库连接池主要有：C3P0、Proxool、DBCP、BoneCP、Druid等。
+由于创建连接和释放连接都有很大的开销（尤其是数据库服务器不在本地时，每次建立连接都需要进行TCP的三次握手，释放连接需要进行TCP四次握手，造成的开销是不可忽视的），为了提升系统访问数据库的性能，可以事先创建若干连接置于连接池中，需要时直接从连接池获取，使用结束时归还连接池而不必关闭连接，从而避免频繁创建和释放连接所造成的开销，这是典型的用空间换取时间的策略（浪费了空间存储连接，但节省了创建和释放连接的时间）。
+
+池化技术在Java开发中是很常见的，在使用线程时创建线程池的道理与此相同。
 
 ### 什么是DAO模式？ 
-答：DAO（Data Access Object）顾名思义是一个为数据库或其他持久化机制提供了抽象接口的对象，在不暴露底层持久化方案实现细节的前提下提供了各种数据访问操作。在实际的开发中，应该将所有对数据源的访问操作进行抽象化后封装在一个公共API中。用程序设计语言来说，就是建立一个接口，接口中定义了此应用程序中将会用到的所有事务方法。在这个应用程序中，当需要和数据源进行交互的时候则使用这个接口，并且编写一个单独的类来实现这个接口，在逻辑上该类对应一个特定的数据存储。DAO模式实际上包含了两个模式，一是Data Accessor（数据访问器），二是Data Object（数据对象），前者要解决如何访问数据的问题，而后者要解决的是如何用对象封装数据。
+DAO（Data Access Object）顾名思义是一个为数据库或其他持久化机制提供了抽象接口的对象，在不暴露底层持久化方案实现细节的前提下提供了各种数据访问操作。
 
-### 在Java程序中，如何获取数据库服务器的相关信息？
-使用DatabaseMetaData可以获取到服务器的信息。当和数据库的连接成功建立了之后，可以通过调用getMetaData()方法来获取数据库的元信息。DatabaseMetaData里面有很多方法，通过它们可以获取到数据库的产品名称，版本号，配置信息等。
-```java
-DatabaseMetaData metaData = con.getMetaData();
-String dbProduct = metaData.getDatabaseProductName();
-```
+在实际的开发中，应该将所有对数据源的访问操作进行抽象化后封装在一个公共API中。用程序设计语言来说，就是建立一个接口，接口中定义了此应用程序中将会用到的所有事务方法。在这个应用程序中，当需要和数据源进行交互的时候则使用这个接口，并且编写一个单独的类来实现这个接口，在逻辑上该类对应一个特定的数据存储。
+
+DAO模式实际上包含了两个模式，一是Data Accessor（数据访问器），二是Data Object（数据对象），前者要解决如何访问数据的问题，而后者要解决的是如何用对象封装数据。
 
 ### JDBC的Statement是什么？
 Statement是JDBC中用来执行数据库SQL查询语句的接口。通过调用连接对象的getStatement()方法我们可以生成一个Statement对象。我们可以通过调用它的execute()，executeQuery()，executeUpdate()方法来执行静态SQL查询。
 
-由于SQL语句是程序中传入的，如果没有对用户输入进行校验的话可能会引起SQL注入的问题，如果想了解更多关于SQL注入的，可以看下这里。
-
 默认情况下，一个Statement同时只能打开一个ResultSet。如果想操作多个ResultSet对象的话，需要创建多个Statement。Statement接口的所有execute方法开始执行时都默认会关闭当前打开的ResultSet。
 
 ### execute，executeQuery，executeUpdate的区别是什么？
-Statement的execute(String query)方法用来执行任意的SQL查询，如果查询的结果是一个ResultSet，这个方法就返回true。如果结果不是ResultSet，比如insert或者update查询，它就会返回false。我们可以通过它的getResultSet方法来获取ResultSet，或者通过getUpdateCount()方法来获取更新的记录条数。
+execute(String query)方法用来执行任意的SQL查询，如果查询的结果是一个ResultSet，这个方法就返回true。如果结果不是ResultSet，比如insert或者update查询，它就会返回false。我们可以通过它的getResultSet方法来获取ResultSet，或者通过getUpdateCount()方法来获取更新的记录条数。
 
-Statement的executeQuery(String query)接口用来执行select查询，并且返回ResultSet。即使查询不到记录返回的ResultSet也不会为null。我们通常使用executeQuery来执行查询语句，这样的话如果传进来的是insert或者update语句的话，它会抛出错误信息为 “executeQuery method can not be used for update”的java.util.SQLException。
+executeQuery(String query)接口用来执行select查询，并且返回ResultSet。即使查询不到记录返回的ResultSet也不会为null。我们通常使用executeQuery来执行查询语句，这样的话如果传进来的是insert或者update语句的话，它会抛出错误信息为 “executeQuery method can not be used for update”的java.util.SQLException。
 
-Statement的executeUpdate(String query)方法用来执行insert或者update/delete（DML）语句，或者 什么也不返回DDL语句。返回值是int类型，如果是DML语句的话，它就是更新的条数，如果是DDL的话，就返回0。
+executeUpdate(String query)方法用来执行insert或者update/delete（DML）语句，或者 什么也不返回DDL语句。返回值是int类型，如果是DML语句的话，它就是更新的条数，如果是DDL的话，就返回0。
 
 只有当你不确定是什么语句的时候才应该使用execute()方法，否则应该使用executeQuery或者executeUpdate方法。
 
@@ -144,9 +141,10 @@ ps.setNull(10, java.sql.Types.INTEGER);
 ### 相对于Statement，PreparedStatement的优点是什么？
 它和Statement相比优点在于：
 
-PreparedStatement有助于防止SQL注入，因为它会自动对特殊字符转义。
-PreparedStatement可以用来进行动态查询。
-PreparedStatement执行更快。尤其当你重用它或者使用它的拼量查询接口执行多条语句时。
+1. 有助于防止SQL注入，因为它会自动对特殊字符转义。
+2. 可以用来进行动态查询。
+3. 执行更快。尤其当你重用它或者使用它的拼量查询接口执行多条语句时。
+
 使用PreparedStatement的setter方法更容易写出面向对象的代码，而Statement的话，我们得拼接字符串来生成查询语句。如果参数太多了，字符串拼接看起来会非常丑陋并且容易出错。
 
 ### PreparedStatement的缺点是什么，怎么解决这个问题？
@@ -156,7 +154,6 @@ PreparedStatement的一个缺点是，我们不能直接用它来执行in条件�
 - 使用存储过程——这取决于数据库的实现，不是所有数据库都支持。
 - 动态生成PreparedStatement——这是个好办法，但是不能享受PreparedStatement的缓存带来的好处了。
 - 在PreparedStatement查询中使用NULL值——如果你知道输入变量的最大个数的话，这是个不错的办法，扩展一下还可以支持无限参数。
-关于这个问题更详细的分析可以看下这篇文章。
 
 ### JDBC的ResultSet是什么？
 在查询数据库后会返回一个ResultSet，它就像是查询结果集的一张数据表。
@@ -207,21 +204,21 @@ stmt.setString(5, country);
 stmt.registerOutParameter(6, java.sql.Types.VARCHAR);
 stmt.executeUpdate();
 ```
-我们得在执行CallableStatement之前注册OUT参数。关于这个更详细的资料可以看这里。
+我们得在执行CallableStatement之前注册OUT参数。
 
 ### JDBC的批处理是什么，有什么好处？
 有时候类似的查询我们需要执行很多遍，比如从CSV文件中加载数据到关系型数据库的表里。我们也知道，执行查询可以用Statement或者PreparedStatement。除此之外，JDBC还提供了批处理的特性，有了它，我们可以在一次数据库调用中执行多条查询语句。
 
 JDBC通过Statement和PreparedStatement中的addBatch和executeBatch方法来支持批处理。
 
-批处理比一条条语句执行的速度要快得多，因为它需要很少的数据库调用，想进一步了解请点这里。
+批处理比一条条语句执行的速度要快得多，因为它需要很少的数据库调用。
 
 ### JDBC的事务管理是什么，为什么需要它？
 默认情况下，我们创建的数据库连接，是工作在自动提交的模式下的。这意味着只要我们执行完一条查询语句，就会自动进行提交。因此我们的每条查询，实际上都是一个事务，如果我们执行的是DML或者DDL，每条语句完成的时候，数据库就已经完成修改了。
 
 有的时候我们希望由一组SQL查询组成一个事务，如果它们都执行OK我们再进行提交，如果中途出现异常了，我们可以进行回滚。
 
-JDBC接口提供了一个setAutoCommit(boolean flag)方法，我们可以用它来关闭连接自动提交的特性。我们应该在需要手动提交时才关闭这个特性，不然的话事务不会自动提交，每次都得手动提交。数据库通过表锁来管理事务，这个操作非常消耗资源。因此我们应当完成操作后尽快的提交事务。在这里有更多关于事务的示例程序。
+JDBC接口提供了一个setAutoCommit(boolean flag)方法，我们可以用它来关闭连接自动提交的特性。我们应该在需要手动提交时才关闭这个特性，不然的话事务不会自动提交，每次都得手动提交。数据库通过表锁来管理事务，这个操作非常消耗资源。因此我们应当完成操作后尽快的提交事务。
 
 ### 如何回滚事务？
 通过Connection对象的rollback方法可以回滚事务。它会回滚这次事务中的所有修改操作，并释放当前连接所持有的数据库锁。
@@ -229,51 +226,16 @@ JDBC接口提供了一个setAutoCommit(boolean flag)方法，我们可以用它�
 ### JDBC的保存点(Savepoint)是什么，如何使用？
 有时候事务包含了一组语句，而我们希望回滚到这个事务的某个特定的点。JDBC的保存点可以用来生成事务的一个检查点，使得事务可以回滚到这个检查点。
 
-一旦事务提交或者回滚了，它生成的任何保存点都会自动释放并失效。回滚事务到某个特定的保存点后，这个保存点后所有其它的保存点会自动释放并且失效。可以读下这个了解更多关于JDBC Savepoint的信息。
+一旦事务提交或者回滚了，它生成的任何保存点都会自动释放并失效。回滚事务到某个特定的保存点后，这个保存点后所有其它的保存点会自动释放并且失效。
 
 ### JDBC的DataSource是什么，有什么好处？
 DataSource即数据源，它是定义在javax.sql中的一个接口，跟DriverManager相比，它的功能要更强大。我们可以用它来创建数据库连接，当然驱动的实现类会实际去完成这个工作。除了能创建连接外，它还提供了如下的特性：
 
-缓存PreparedStatement以便更快的执行
-可以设置连接超时时间
-提供日志记录的功能
-ResultSet大小的最大阈值设置
-通过JNDI的支持，可以为servlet容器提供连接池的功能
-
-### 如何通过JDBC的DataSource和Apache Tomcat的JNDI来创建连接池？
-对部署在servlet容器中的WEB程序而言，创建数据库连接池非常简单，仅需要以下几步。
-
-在容器的配置文件中创建JDBC的JNDI资源，通常在server.xml或者context.xml里面。像这样：
-```java
-<Resource name="jdbc/MyDB"
-      global="jdbc/MyDB"
-      auth="Container"
-      type="javax.sql.DataSource"
-      driverClassName="com.mysql.jdbc.Driver"
-      url="jdbc:mysql://localhost:3306/UserDB"
-      username="pankaj"
-      password="pankaj123"
-      maxActive="100"
-      maxIdle="20"
-      minIdle="5"
-      maxWait="10000"/>
-```
-```java
-<ResourceLink name="jdbc/MyLocalDB"
-                global="jdbc/MyDB"
-                auth="Container"
-                type="javax.sql.DataSource" />
-```
-在WEB应用程序中，先用InitialContext来查找JNDI资源，然后获取连接。
-```java
-Context ctx = new InitialContext();
-DataSource ds = (DataSource) ctx.lookup("java:/comp/env/jdbc/MyLocalDB");
-```
-
-### Apache的DBCP是什么？
-如果用DataSource来获取连接的话，通常获取连接的代码和驱动特定的DataSource是紧耦合的。另外，除了选择DataSource的实现类，剩下的代码基本都是一样的。
-
-Apache的DBCP就是用来解决这些问题的，它提供的DataSource实现成为了应用程序和不同JDBC驱动间的一个抽象层。Apache的DBCP库依赖commons-pool库，所以要确保它们都在部署路径下。
+- 缓存PreparedStatement以便更快的执行
+- 可以设置连接超时时间
+- 提供日志记录的功能
+- ResultSet大小的最大阈值设置
+- 通过JNDI的支持，可以为servlet容器提供连接池的功能
 
 ### 什么是数据库的隔离级别？
 当我们为了数据的一致性使用事务时，数据库系统用锁来防止别人访问事务中用到的数据。数据库通过锁来防止脏读，不可重复读(Non-Repeatable Reads)及幻读（Phantom-Read）的问题。
@@ -391,7 +353,7 @@ Exception in thread "main" java.lang.NullPointerException
 - 如果你需要长时间对ResultSet进行操作的话，尽量使用离线的RowSet。
 
 ### 事务的ACID是指什么？ 
-答： 
+
 - 原子性(Atomic)：事务中各项操作，要么全做要么全不做，任何一项操作的失败都会导致整个事务的失败； 
 - 一致性(Consistent)：事务结束后系统状态是一致的； 
 - 隔离性(Isolated)：并发执行的事务彼此无法看到对方的中间状态； 
@@ -470,7 +432,8 @@ Exception in thread "main" java.lang.NullPointerException
 需要说明的是，事务隔离级别和数据访问的并发性是对立的，事务隔离级别越高并发性就越差。所以要根据具体的应用来确定合适的事务隔离级别，这个地方没有万能的原则。
 
 ### JDBC中如何进行事务处理？ 
-答：Connection提供了事务处理的方法，通过调用setAutoCommit(false)可以设置手动提交事务；当事务完成后用commit()显式提交事务；如果在事务处理过程中发生异常则通过rollback()进行事务回滚。除此之外，从JDBC 3.0中还引入了Savepoint（保存点）的概念，允许通过代码设置保存点并让事务回滚到指定的保存点。 
+Connection提供了事务处理的方法，通过调用setAutoCommit(false)可以设置手动提交事务；当事务完成后用commit()显式提交事务；如果在事务处理过程中发生异常则通过rollback()进行事务回滚。
+除此之外，从JDBC 3.0中还引入了Savepoint（保存点）的概念，允许通过代码设置保存点并让事务回滚到指定的保存点。 
 ![image_1bmf383no15vdk7e10gd941bkl9.png-4.3kB][2]
 
 ### 结束
