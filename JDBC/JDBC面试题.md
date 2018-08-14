@@ -9,18 +9,6 @@ JDBC的全称是Java DataBase Connection，也就是Java数据库连接，我们
 
 JDBC接口让Java程序和JDBC驱动实现了松耦合，使得切换不同的数据库变得更加简单。
 
-### 有哪些不同类型的JDBC驱动？
-有四类JDBC驱动。和数据库进行交互的Java程序分成两个部分，一部分是JDBC的API，实际工作的驱动则是另一部分。
-![image_1blq868ecc3bguks6o17ro1eo919.png-275.8kB][1]
-
-A JDBC-ODBC Bridge plus ODBC Driver（类型1）：它使用ODBC驱动连接数据库。需要安装ODBC以便连接数据库，正因为这样，这种方式现在已经基本淘汰了。
-
-B Native API partly Java technology-enabled driver（类型2）：这种驱动把JDBC调用适配成数据库的本地接口的调用。
-
-C Pure Java Driver for Database Middleware（类型3）：这个驱动把JDBC调用转发给中间件服务器，由它去和不同的数据库进行连接。用这种类型的驱动需要部署中间件服务器。这种方式增加了额外的网络调用，导致性能变差，因此很少使用。
-
-D Direct-to-Database Pure Java Driver（类型4）：这个驱动把JDBC转化成数据库使用的网络协议。这种方案最简单，也适合通过网络连接数据库。不过使用这种方式的话，需要根据不同数据库选用特定的驱动程序，比如OJDBC是Oracle开发的Oracle数据库的驱动，而MySQL Connector/J是MySQL数据库的驱动。
-
 ### JDBC是如何实现Java程序和JDBC驱动的松耦合的？
 JDBC API使用Java的反射机制来实现Java程序和JDBC驱动的松耦合。随便看一个简单的JDBC示例，你会发现所有操作都是通过JDBC接口完成的，而驱动只有在通过Class.forName反射机制来加载的时候才会出现。
 
@@ -169,19 +157,6 @@ Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 
 可以通过ResultSet的getter方法，传入列名或者从1开始的序号来获取列数据。
 
-### 有哪些不同的ResultSet？
-根据创建Statement时输入参数的不同，会对应不同类型的ResultSet。如果你看下Connection的方法，你会发现createStatement和prepareStatement方法重载了，以支持不同的ResultSet和并发类型。
-
-一共有三种ResultSet对象。
-
-- ResultSet.TYPE_FORWARD_ONLY：这是默认的类型，它的游标只能往下移。
-- ResultSet.TYPE_SCROLL_INSENSITIVE：游标可以上下移动，一旦它创建后，数据库里的数据再发生修改，对它来说是透明的。
-- ResultSet.TYPE_SCROLL_SENSITIVE：游标可以上下移动，如果生成后数据库还发生了修改操作，它是能够感知到的。
-ResultSet有两种并发类型。
-
-- ResultSet.CONCUR_READ_ONLY:ResultSet是只读的，这是默认类型。
-- ResultSet.CONCUR_UPDATABLE:我们可以使用ResultSet的更新方法来更新里面的数据。
-
 ### Statement中的setFetchSize和setMaxRows方法有什么用处？
 setMaxRows可以用来限制返回的数据集的行数。当然通过SQL语句也可以实现这个功能。比如在MySQL中我们可以用LIMIT条件来设置返回结果的最大行数。
 
@@ -190,21 +165,6 @@ setFetchSize理解起来就有点费劲了，因为你得知道Statement和Resul
 假设我们有一条查询返回了100行数据，我们把fetchSize设置成了10，那么数据库驱动每次只会取10条数据，也就是说得取10次。当每条数据需要处理的时间比较长的时候并且返回数据又非常多的时候，这个可选的参数就变得非常有用了。
 
 我们可以通过Statement来设置fetchSize参数，不过它会被ResultSet对象设置进来的值所覆盖掉。
-
-### 如何使用JDBC接口来调用存储过程？
-存储过程就是数据库编译好的一组SQL语句，可以通过JDBC接口来进行调用。我们可以通过JDBC的CallableStatement接口来在数据库中执行存储过程。初始化CallableStatement的语法是这样的：
-```java
-CallableStatement stmt = con.prepareCall("{call insertEmployee(?,?,?,?,?,?)}");
-stmt.setInt(1, id);
-stmt.setString(2, name);
-stmt.setString(3, role);
-stmt.setString(4, city);
-stmt.setString(5, country);
-//register the OUT parameter before calling the stored procedure
-stmt.registerOutParameter(6, java.sql.Types.VARCHAR);
-stmt.executeUpdate();
-```
-我们得在执行CallableStatement之前注册OUT参数。
 
 ### JDBC的批处理是什么，有什么好处？
 有时候类似的查询我们需要执行很多遍，比如从CSV文件中加载数据到关系型数据库的表里。我们也知道，执行查询可以用Statement或者PreparedStatement。除此之外，JDBC还提供了批处理的特性，有了它，我们可以在一次数据库调用中执行多条查询语句。
@@ -237,40 +197,6 @@ DataSource即数据源，它是定义在javax.sql中的一个接口，跟DriverM
 - ResultSet大小的最大阈值设置
 - 通过JNDI的支持，可以为servlet容器提供连接池的功能
 
-### 什么是数据库的隔离级别？
-当我们为了数据的一致性使用事务时，数据库系统用锁来防止别人访问事务中用到的数据。数据库通过锁来防止脏读，不可重复读(Non-Repeatable Reads)及幻读（Phantom-Read）的问题。
-
-数据库使用JDBC设置的隔离级别来决定它使用何种锁机制，我们可以通过Connection的getTransactionIsolation和setTransactionIsolation方法来获取和设置数据库的隔离级别。
-
-|隔离级别 |	事务 |	脏读	| 不可重复读 |	幻读 |
-| --------   | -----  | -----  | -----  | -----  |
-|TRANSACTION_NONE|	不支持	|不可用|	不可用|	不可用|
-|TRANSACTION_READ_COMMITTED|	支持|	阻止|	允许|	允许|
-|TRANSACTION_READ_UNCOMMITTED	|支持	|允许	|允许|	允许|
-|TRANSACTION_REPEATABLE_READ	|支持	|阻止	|阻止	|允许|
-|TRANSACTION_SERIALIZABLE	|支持	|阻止	|阻止	|阻止|
-
-### JDBC的RowSet是什么，有哪些不同的RowSet？
-RowSet用于存储查询的数据结果，和ResultSet相比，它更具灵活性。RowSet继承自ResultSet，因此ResultSet能干的，它们也能，而ResultSet做不到的，它们还是可以。RowSet接口定义在javax.sql包里。
-
-RowSet提供的额外的特性有：
-
-- 提供了Java Bean的功能，可以通过settter和getter方法来设置和获取属性。RowSet使用了JavaBean的事件驱动模型，它可以给注册的组件发送事件通知，比如游标的移动，行的增删改，以及RowSet内容的修改等。
-- RowSet对象默认是可滚动，可更新的，因此如果数据库系统不支持ResultSet实现类似的功能，可以使用RowSet来实现。
-RowSet分为两大类：
-
-A. 连接型RowSet——这类对象与数据库进行连接，和ResultSet很类似。JDBC接口只提供了一种连接型RowSet，javax.sql.rowset.JdbcRowSet，它的标准实现是com.sun.rowset.JdbcRowSetImpl。 B. 离线型RowSet——这类对象不需要和数据库进行连接，因此它们更轻量级，更容易序列化。它们适用于在网络间传递数据。有四种不同的离线型RowSet的实现。
-
-- CachedRowSet——可以通过他们获取连接，执行查询并读取ResultSet的数据到RowSet里。我们可以在离线时对数据进行维护和更新，然后重新连接到数据库里，并回写改动的数据。
-- WebRowSet继承自CachedRowSet——他可以读写XML文档。
-- JoinRowSet继承自WebRowSet——它不用连接数据库就可以执行SQL的join操作。
-- FilteredRowSet继承自WebRowSet——我们可以用它来设置过滤规则，这样只有选中的数据才可见。
-
-### RowSet和ResultSet的区别是什么？
-RowSet继承自ResultSet，因此它有ResultSet的全部功能，同时它自己添加了些额外的特性。RowSet一个最大的好处是它可以是离线的，这样使得它更轻量级，同时便于在网络间进行传输。
-
-具体使用哪个取决于你的需求，不过如果你操作ResultSet对象的时间较长的话，最好选择一个离线的RowSet，这样可以释放数据库连接。
-
 ### 常见的JDBC异常有哪些？
 有以下这些：
 
@@ -283,11 +209,6 @@ RowSet继承自ResultSet，因此它有ResultSet的全部功能，同时它自�
 CLOB意思是Character Large OBjects，字符大对象，它是由单字节字符组成的字符串数据，有自己专门的代码页。这种数据类型适用于存储超长的文本信息，那些可能会超出标准的VARCHAR数据类型长度限制（上限是32KB）的文本。
 
 BLOB是Binary Larget OBject，它是二进制大对象，由二进制数据组成，没有专门的代码页。它能用于存储超过VARBINARY限制（32KB）的二进制数据。这种数据类型适合存储图片，声音，图形，或者其它业务程序特定的数据。
-
-### JDBC的脏读是什么？哪种数据库隔离级别能防止脏读？
-当我们使用事务时，有可能会出现这样的情况，有一行数据刚更新，与此同时另一个查询读到了这个刚更新的值。这样就导致了脏读，因为更新的数据还没有进行持久化，更新这行数据的业务可能会进行回滚，这样这个数据就是无效的。
-
-数据库的TRANSACTIONREADCOMMITTED，TRANSACTIONREPEATABLEREAD，和TRANSACTION_SERIALIZABLE隔离级别可以防止脏读。
 
 ### 什么是两阶段提交？
 当我们在分布式系统上同时使用多个数据库时，这时候我们就需要用到两阶段提交协议。两阶段提交协议能保证是分布式系统提交的原子性。在第一个阶段，事务管理器发所有的事务参与者发送提交的请求。如果所有的参与者都返回OK，它会向参与者正式提交该事务。如果有任何一个参与方返回了中止消息，事务管理器会回滚所有的修改动作。
@@ -309,34 +230,6 @@ java.util.Date包含日期和时间，而java.sql.Date只包含日期信息，�
 
 ### 如何把图片或者原始数据插入到数据库中？
 可以使用BLOB类型将图片或者原始的二进制数据存储到数据库里。
-
-### 什么是幻读，哪种隔离级别可以防止幻读？
-幻读是指一个事务多次执行一条查询返回的却是不同的值。假设一个事务正根据某个条件进行数据查询，然后另一个事务插入了一行满足这个查询条件的数据。之后这个事务再次执行了这条查询，返回的结果集中会包含刚插入的那条新数据。这行新数据被称为幻行，而这种现象就叫做幻读。
-
-只有TRANSACTION_SERIALIZABLE隔离级别才能防止产生幻读。
-
-### SQLWarning是什么，在程序中如何获取SQLWarning？
-SQLWarning是SQLException的子类，通过Connection, Statement, Result的getWarnings方法都可以获取到它。 SQLWarning不会中断查询语句的执行，只是用来提示用户存在相关的警告信息。
-
-### 如果Oracle的存储过程的入参出参中包含数据库对象，应该如何进行调用？
-如果Oracle的存储过程的入参出参中包含数据库对象，我们需要在程序创建一个同样大小的对象数组，然后用它来生成Oracle的STRUCT对象。然后可以通过数据库对象的setSTRUCT方法传入这个struct对象，并对它进行使用。
-
-### 如果java.sql.SQLException: No suitable driver found该怎么办？
-如果你的SQL URL串格式不正确的话，就会抛出这样的异常。不管是使用DriverManager还是JNDI数据源来创建连接都有可能抛出这种异常。它的异常栈看起来会像下面这样。
-```java
-org.apache.tomcat.dbcp.dbcp.SQLNestedException: Cannot create JDBC driver of class 'com.mysql.jdbc.Driver' for connect URL ''jdbc:mysql://localhost:3306/UserDB'
-    at org.apache.tomcat.dbcp.dbcp.BasicDataSource.createConnectionFactory(BasicDataSource.java:1452)
-    at org.apache.tomcat.dbcp.dbcp.BasicDataSource.createDataSource(BasicDataSource.java:1371)
-    at org.apache.tomcat.dbcp.dbcp.BasicDataSource.getConnection(BasicDataSource.java:1044)
-java.sql.SQLException: No suitable driver found for 'jdbc:mysql://localhost:3306/UserDB
-    at java.sql.DriverManager.getConnection(DriverManager.java:604)
-    at java.sql.DriverManager.getConnection(DriverManager.java:221)
-    at com.journaldev.jdbc.DBConnection.getConnection(DBConnection.java:24)
-    at com.journaldev.jdbc.DBConnectionTest.main(DBConnectionTest.java:15)
-Exception in thread "main" java.lang.NullPointerException
-    at com.journaldev.jdbc.DBConnectionTest.main(DBConnectionTest.java:16)
-```
-解决这类问题的方法就是，检查下日志文件，像上面的这个日志中，URL串是'jdbc:mysql://localhost:3306/UserDB，只要把它改成jdbc:mysql://localhost:3306/UserDB就好了。
 
 ### 什么是JDBC的最佳实践？
 下面列举了其中的一些：
@@ -421,7 +314,7 @@ Exception in thread "main" java.lang.NullPointerException
 |T8	|提交事务	 ||
 |T9	|查询账户余额为1100元（丢失更新）|	 |
 数据并发访问所产生的问题，在有些场景下可能是允许的，但是有些场景下可能就是致命的，数据库通常会通过锁机制来解决数据并发访问问题，按锁定对象不同可以分为表级锁和行级锁；按并发事务锁定关系可以分为共享锁和独占锁，具体的内容大家可以自行查阅资料进行了解。 
-直接使用锁是非常麻烦的，为此数据库为用户提供了自动锁机制，只要用户指定会话的事务隔离级别，数据库就会通过分析SQL语句然后为事务访问的资源加上合适的锁，此外，数据库还会维护这些锁通过各种手段提高系统的性能，这些对用户来说都是透明的（就是说你不用理解，事实上我确实也不知道）。ANSI/ISO SQL 92标准定义了4个等级的事务隔离级别，如下表所示：
+直接使用锁是非常麻烦的，为此数据库为用户提供了自动锁机制，只要用户指定会话的事务隔离级别，数据库就会通过分析SQL语句然后为事务访问的资源加上合适的锁，此外，数据库还会维护这些锁通过各种手段提高系统的性能，这些对用户来说都是透明的。ANSI/ISO SQL 92标准定义了4个等级的事务隔离级别，如下表所示：
 
 | 隔离级别	| 脏读| 	不可重复读| 	幻读|  第一类丢失更新| 	第二类丢失更新| 
 | --- | --- | --- | --- | --- | --- |
