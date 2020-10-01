@@ -22,7 +22,7 @@ github地址：https://github.com/Homiss/Java-interview-questions
     - [Java面试题之多线程(三)][5]
     - [Java面试题之多线程(四)][6]
 - [ ] I／O
-- [ ] Annotation
+- [ ] Annotations
 - [x] JDBC
 - [x] 异常处理
 - [x] JVM
